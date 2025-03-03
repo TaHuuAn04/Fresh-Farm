@@ -16,6 +16,16 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": false,
     "strictBindCallApply": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@environments": ["environments"],
+      "@entities": ["database/entities"],
+      "@modules": ["src/modules"],
+      "@modules/*": ["src/modules/*"],
+      "@config": ["src/config"],
+      "@common/*": ["src/common/*"],
+      "@core/*": ["src/core/*"],
+      "@utils/*": ["src/utils/*"]
+    }
   }
 }
