@@ -7,6 +7,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import Footer from "@/components/footer";
 import Header from "@/components/header";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -46,6 +47,7 @@ export default function RootLayout({
           </SidebarProvider>
           </div>
           <Spinner />
+          <Toaster />
         </ReduxProvider>
       </body>
     </html>

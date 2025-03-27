@@ -34,3 +34,15 @@ export const sidebarFooterData: sidebarType = {
   title: "Log Out",
   icon: LogOut,
 } 
+
+export type CreateDeviceDto = {
+  name: string,
+  status?: string,
+  description?: string
+}
+
+export type UpdateDeviceDto = Partial<CreateDeviceDto>;
+
+export type ToggleDeviceDto = {
+  status?: string
+}
