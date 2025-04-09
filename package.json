@@ -1,0 +1,19 @@
+{
+  "name": "DaNganh_TTNT",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Running tests...\"",
+    "prepare": "husky install"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@nestjs/config": "^4.0.1",
+    "husky": "^9.1.7",
+    "lint": "^0.8.19",
+    "winston": "^3.17.0"
+  }
+}
