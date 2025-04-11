@@ -11,9 +11,29 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@nestjs/cache-manager": "^3.0.1",
     "@nestjs/config": "^4.0.1",
+    "@nestjs/jwt": "^11.0.0",
+    "@nestjs/passport": "^11.0.5",
+    "@novu/node": "^2.6.6",
+    "@types/cookie-parser": "^1.4.8",
+    "@types/express": "^5.0.1",
+    "@types/passport-jwt": "^4.0.1",
+    "@types/passport-local": "^1.0.38",
+    "bcryptjs": "^3.0.2",
+    "cache-manager": "^6.4.2",
+    "cache-manager-ioredis": "^2.1.0",
+    "cookie-parser": "^1.4.7",
     "husky": "^9.1.7",
+    "ioredis": "^5.6.0",
     "lint": "^0.8.19",
+    "novu": "^2.6.6",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
+    "passport-local": "^1.0.0",
     "winston": "^3.17.0"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^3.0.0"
   }
 }
