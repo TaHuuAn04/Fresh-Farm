@@ -9,6 +9,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { WinstonModule } from 'nest-winston';
 import { CONFIG_KEY } from './config/config-key';
 import loggerConfig from './config/logger/log.config';
+import { CacheModule } from '@nestjs/cache-manager';
+import { redisStore } from 'cache-manager-ioredis';
+import { AuthModule } from '@modules/auth/auth.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -22,9 +25,18 @@ import loggerConfig from './config/logger/log.config';
         transports: configService.get(CONFIG_KEY.LOGGER).transports,
       }),
     }),
+    // CacheModule.registerAsync({
+    //   useFactory: async () => ({
+    //     store: await redisStore({
+    //       url: 'redis://localhost:6379',
+    //     }),
+    //   }),
+    //   isGlobal: true,
+    // }),
     DatabaseModule,
     DevicesModule,
     AdafruitModule,
+    AuthModule
   ],
   controllers: [AppController],
   providers: [AppService],
