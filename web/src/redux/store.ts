@@ -1,9 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import spinnerReducer from "./slices/spinnerSlice";
+import userReducer from "./slices/user.slice";
 
 export const store = configureStore({
   reducer: {
     spinner: spinnerReducer,
+    user: userReducer,
   },
 });
 

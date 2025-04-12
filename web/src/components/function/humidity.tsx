@@ -1,34 +1,40 @@
-"use client"
+"use client";
 
-import { Droplets } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Slider } from "@/components/ui/slider"
-import { useEffect, useState } from "react"
-import { getDevice } from "@/api/devices"
-import { toast } from "sonner"
+import { Droplets } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Slider } from "@/components/ui/slider";
+import { useEffect, useState } from "react";
+import { getDevice } from "@/api/devices";
+import { toast } from "sonner";
 
 export default function HumidityCard() {
-  const [humidState, setHumidState] = useState()
+  const [humidState, setHumidState] = useState();
 
   useEffect(() => {
     setInterval(() => {
       async function firstFetchHumid() {
-        const fan = await getDevice('1854fee1-769c-4bc4-9263-9697853d54a3')
-  
-        if(fan?.statusCode >= 400) {
-          toast.error("Failure", {
-            description: fan?.message || ""
-          })
+        const fan = await getDevice("1854fee1-769c-4bc4-9263-9697853d54a3");
+
+        if (fan?.statusCode && fan?.statusCode < 300) {
+          setHumidState(fan?.data?.last_value);
         } else {
-          setHumidState(fan?.data?.last_value)
+          toast.error("Failure", {
+            description: fan?.data?.message || "",
+          });
         }
       }
-  
-      firstFetchHumid()
-    }, 2000)
-    
-  }, [])
+
+      firstFetchHumid();
+    }, 2000);
+  }, []);
 
   return (
     <Card>
@@ -59,6 +65,5 @@ export default function HumidityCard() {
         </div>
       </CardFooter>
     </Card>
-  )
+  );
 }
-

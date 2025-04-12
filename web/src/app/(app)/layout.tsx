@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import "../globals.css";
 import ReduxProvider from "@/redux/provider";
 import Spinner from "@/components/spinner";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/app-sidebar";
 import Footer from "@/components/footer";
+import Header from "@/components/header";
 import { Toaster } from "sonner";
 
 const geistSans = Geist({
@@ -27,19 +30,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased mx-auto min-h-screen w-full`}
-      >
-        <ReduxProvider>
-          <div className="w-full flex flex-col">
+    <div
+      className={`${geistSans.variable} ${geistMono.variable} antialiased mx-auto min-h-screen`}
+    >
+      <div className="bg-[7ddaf7] min-h-screen w-full">
+        <SidebarProvider>
+          <AppSidebar />
+          <SidebarTrigger />
+          <div className="w-full mx-auto">
+            <Header />
             {children}
             <Footer />
           </div>
-          <Spinner />
-          <Toaster />
-        </ReduxProvider>
-      </body>
-    </html>
+        </SidebarProvider>
+      </div>
+    </div>
   );
 }
