@@ -1,6 +1,7 @@
 "use client";
 import { RootState } from "@/redux/store";
 import { Mic, CircleUserRound } from "lucide-react";
+import Link from "next/link";
 import { useSelector } from "react-redux";
 
 const Header = () => {
@@ -19,10 +20,10 @@ const Header = () => {
             </div>
           </div>
           <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
+            <Link className="flex items-center space-x-2" href={"/profile"}>
               <CircleUserRound className="h-5 w-5 text-gray-700" />
               <span className="text-gray-800 font-medium">{fullName}</span>
-            </div>
+            </Link>
             <button
               className="p-1 rounded-full hover:bg-gray-100"
               aria-label="Voice command"
