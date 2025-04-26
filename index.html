@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Adafruit Realtime Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f4f8;
+      padding: 2rem;
+    }
+    h1 {
+      color: #333;
+    }
+    #data-box {
+      margin-top: 20px;
+      padding: 1rem;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      font-size: 1.5rem;
+      color: #007BFF;
+    }
+  </style>
+</head>
+<body>
+  <h1>🛰️ Realtime Data from Adafruit IO</h1>
+  <div id="data-box">Waiting for data...</div>
+
+  <!-- Socket.IO CDN -->
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"
+          integrity="sha384-oJcRiZgADRTybDbp3qT9eZBNKbnhtxF+ON1qg9nqPy78WqgWwtzRU/vL9l5gZlL2"
+          crossorigin="anonymous"></script>
+  <script>
+    const socket = io("http://localhost:3000"); // Đổi nếu BE chạy trên domain khác
+
+    socket.on("connect", () => {
+      console.log("✅ Connected to WebSocket server");
+    });
+
+    socket.on("adafruit-data", (data) => {
+      console.log("📡 Dữ liệu từ Adafruit:", data);
+      const box = document.getElementById("data-box");
+      box.textContent = `Giá trị: ${data.data}`;
+    });
+
+    socket.on("disconnect", () => {
+      console.log("❌ Disconnected");
+    });
+  </script>
+</body>
+</html>

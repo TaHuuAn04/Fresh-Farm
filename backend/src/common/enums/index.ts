@@ -1,4 +1,5 @@
 export enum DeviceStatus {
+  PA = 'pending activce',
   OFFLINE = 'offline',
   ONLINE = 'online',
 }

@@ -20,7 +20,7 @@ import RequestWithUser from './interface/requestWithUser.interface';
 import { Response } from 'express';
 import JwtAuth from './guard/jwtAuth.guard';
 import { UsersService } from '@modules/users/users.service';
-import JwtRefreshGuard from './guard/jwtAuth-refresh.guard';
+import JwtRefreshGuard from './guard/jwtAuthRefresh.guard';
 
 @Controller('auth')
 export class AuthController {

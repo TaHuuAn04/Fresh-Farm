@@ -1,9 +1,9 @@
 import { AppError } from '@common/dtos/errorResponse.dto';
-import { HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
 @Injectable()
-export default class JwtAuthGuard extends AuthGuard('jwt') {
+export default class JwtRefreshGuard extends AuthGuard('jwt-refresh-token') {
   handleRequest(err, user, info, context) {
     if (err || !user) {
       throw new AppError(
