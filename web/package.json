@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
+    "@radix-ui/react-avatar": "^1.1.7",
     "@radix-ui/react-checkbox": "^1.1.5",
     "@radix-ui/react-dialog": "^1.1.6",
     "@radix-ui/react-label": "^2.1.4",
@@ -31,6 +32,7 @@
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.56.1",
     "react-redux": "^9.2.0",
+    "socket.io-client": "^4.8.1",
     "sonner": "^2.0.1",
     "tailwind-merge": "^3.0.2",
     "tailwindcss-animate": "^1.0.7",

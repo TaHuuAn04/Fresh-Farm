@@ -1,5 +1,10 @@
-import { HttpStatusCode } from "axios";
-import { House, ChartLine, CalendarClock, Wrench, LogOut } from "lucide-react";
+import {
+  House,
+  CalendarClock,
+  Wrench,
+  LogOut,
+  BotMessageSquare,
+} from "lucide-react";
 
 type sidebarType = {
   title: string;
@@ -19,9 +24,9 @@ export const sidebarData: sidebarType[] = [
     icon: Wrench,
   },
   {
-    title: "Chart",
-    url: "/chart",
-    icon: ChartLine,
+    title: "Chat",
+    url: "/chat",
+    icon: BotMessageSquare,
   },
   {
     title: "History",

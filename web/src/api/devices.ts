@@ -20,7 +20,7 @@ export async function getAllDevices() {
 export async function getDevice(id: string) {
   try {
     const res = await axios.get(`${BASE_URL}/${id}`);
-    console.log("res", res);
+    // console.log("res", res);
 
     return res?.data;
   } catch (error) {

@@ -24,17 +24,17 @@ export default function FunctionPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Temperature Control Card */}
         <Suspense fallback={<div>Loading...</div>}>
-          <TemperatureCard />
+          {/* <TemperatureCard /> */}
         </Suspense>
 
         {/* Fan Control Card */}
         <Suspense fallback={<div>Loading...</div>}>
-          <FanCard />
+          {/* <FanCard /> */}
         </Suspense>
 
         {/* Humidity Control Card */}
         <Suspense fallback={<div>Loading...</div>}>
-          <HumidityCard />
+          {/* <HumidityCard /> */}
         </Suspense>
 
         {/* Light Control Card */}

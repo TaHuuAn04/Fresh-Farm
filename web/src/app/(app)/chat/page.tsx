@@ -1,7 +1,10 @@
 import { getDevice } from "@/api/devices";
 import { redirect } from "next/navigation";
+import { lazy, Suspense } from "react";
 
-export default function ChartPage() {
+const ChatComp = lazy(() => import("../../../components/chat/chat-comp"));
+
+export default function ChatPage() {
   async function firstFetchHumid() {
     const fan = await getDevice("1854fee1-769c-4bc4-9263-9697853d54a3");
 
@@ -11,5 +14,9 @@ export default function ChartPage() {
   }
 
   firstFetchHumid();
-  return <div>asdf</div>;
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ChatComp />
+    </Suspense>
+  );
 }

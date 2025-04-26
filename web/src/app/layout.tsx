@@ -34,7 +34,7 @@ export default function RootLayout({
         <ReduxProvider>
           <div className="w-full flex flex-col">
             {children}
-            <Footer />
+            {/* <Footer /> */}
           </div>
           <Spinner />
           <Toaster />
