@@ -7,10 +7,12 @@ import { DeviceRepository } from './repositories/device.repository';
 import { IDeviceRepository } from './repositories/device.repository.interface';
 import { DEVICE_REPOSITORY } from '@common/constants';
 import { DevicesController } from './devices.controller';
+import { DeviceGateway } from './device.gateway';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Device])],
   providers: [
+    DeviceGateway,
     DevicesService,
     AdafruitService,
     {

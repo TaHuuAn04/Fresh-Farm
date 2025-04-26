@@ -6,18 +6,23 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { DevicesService } from './devices.service';
 import { CreateDeviceDto } from '@modules/devices/dtos/createDevice.dto';
 import { UpdateDeviceDto } from '@modules/devices/dtos/updateDevice.dto';
 import { ToggleDeviceDto } from '@modules/devices/dtos/toggleDevice.dto';
+import JwtAuthGuard from '@modules/auth/guard/jwtAuth.guard';
+import RequestWithUser from '@modules/auth/interface/requestWithUser.interface';
 
 @ApiTags('Devices')
 @Controller('devices')
 export class DevicesController {
   constructor(private readonly devicesService: DevicesService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post()
   @ApiOperation({ summary: 'Tạo một thiết bị mới' })
   @ApiResponse({ status: 201, description: 'Thiết bị được tạo thành công' })
@@ -25,10 +30,11 @@ export class DevicesController {
   async create(@Body() createDeviceDto: CreateDeviceDto) {
     return this.devicesService.create(createDeviceDto);
   }
-
+  
+  @UseGuards(JwtAuthGuard)
   @Get()
   @ApiOperation({ summary: 'Lấy danh sách tất cả thiết bị' })
-  async findAll() {
+  async findAll(@Req() request: RequestWithUser) {
     return this.devicesService.findAll();
   }
 

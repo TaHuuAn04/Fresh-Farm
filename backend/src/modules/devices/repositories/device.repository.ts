@@ -27,6 +27,12 @@ export class DeviceRepository implements IDeviceRepository {
     return this.repo.findOne({ where: { id } });
   }
 
+  
+
+  async findOneByKey(key: string): Promise<Device | null> {
+    return this.repo.findOne({ where: { key } });
+  }
+
   async remove(device: Device): Promise<void> {
     await this.repo.remove(device);
   }

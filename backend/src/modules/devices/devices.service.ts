@@ -69,6 +69,11 @@ export class DevicesService {
     return device;
   }
 
+  async findUserIdByDeviceId(key: string): Promise<string | null> {
+    const device = await this.deviceRepository.findOneByKey(key);
+    return device?.ownerId || null;
+  }
+
   async update(id: string, updateDeviceDto: UpdateDeviceDto): Promise<Device> {
     const device = await this.findOne(id);
 
