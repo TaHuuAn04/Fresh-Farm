@@ -209,8 +209,26 @@ class LeafDetection:
 
                     if class_name == 'Healthy':
                         health_status["Healthy"] += 1
-                    elif class_name != 'unknown':
-                        health_status["Diseased"] += 1
+                    elif class_name == 'Bacterial Spot':
+                        health_status["Bacterial Spot"] += 1
+                    elif class_name == 'Early Blight':
+                        health_status["Early Blight"] += 1
+                    elif class_name == 'Late Blight':
+                        health_status["Late Blight"] += 1
+                    elif class_name == 'Leaf Mold':
+                        health_status["Leaf Mold"] += 1
+                    elif class_name == 'Leaf_Miner':
+                        health_status["Leaf Miner"] += 1
+                    elif class_name == 'Mosaic Virus':
+                        health_status["Mosaic Virus"] += 1
+                    elif class_name == 'Septoria':
+                        health_status["Septoria"] += 1
+                    elif class_name == 'Spider Mites':
+                        health_status["Spider Mites"] += 1
+                    elif class_name == 'Yellow Leaf Curl Virus':
+                        health_status["Yellow Leaf Curl Virus"] += 1
+                    elif class_name == 'plant-health':
+                        health_status["Plant Health"] += 1
                     else:
                         health_status["unknown"] += 1
         
