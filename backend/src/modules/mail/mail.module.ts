@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { MailService } from './mail.service';
 //import { BullModule } from '@nestjs/bull';
 import { MailController } from './mail.controller';
+import { MAIL_PASS, MAIL_USER } from '@environments';
 // import { MailProcessor } from './mail.processor';
 
 @Module({
@@ -13,8 +14,8 @@ import { MailController } from './mail.controller';
         port: 587,
         secure: false,
         auth: {
-          user: 'shopnex0409@gmail.com',
-          pass: 'bgjl lcwv jwil yjqm',
+          user: MAIL_USER,
+          pass: MAIL_PASS,
         },
       },
       defaults: {

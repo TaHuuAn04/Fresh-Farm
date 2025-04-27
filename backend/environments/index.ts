@@ -28,3 +28,6 @@ export const JWT_REFRESH_TOKEN_SECRET =
   process.env.JWT_REFRESH_TOKEN_SECRET || 'defaultSecret';
 export const JWT_REFRESH_TOKEN_EXPIRATION_TIME =
   process.env.JWT_REFRESH_TOKEN_EXPIRATION_TIME || `${60 * 60 * 24 * 7}`;
+
+export const MAIL_USER = process.env.MAIL_USER || 'email';
+export const MAIL_PASS = process.env.MAIL_PASS || 'password';
