@@ -11,7 +11,8 @@ import loggerConfig from './config/logger/log.config';
 import { AuthModule } from '@modules/auth/auth.module';
 //import { BullModule } from '@nestjs/bull';
 import { MailModule } from '@modules/mail/mail.module';
-
+import { CacheModule } from '@nestjs/cache-manager';
+import * as redisStore from 'cache-manager-redis-store';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -25,20 +26,13 @@ import { MailModule } from '@modules/mail/mail.module';
         transports: configService.get(CONFIG_KEY.LOGGER).transports,
       }),
     }),
-    // BullModule.forRoot({
-    //   redis: {
-    //     host: 'localhost',
-    //     port: 6379,
-    //   },
-    // }),
-    // CacheModule.registerAsync({
-    //   useFactory: async () => ({
-    //     store: await redisStore({
-    //       url: 'redis://localhost:6379',
-    //     }),
-    //   }),
-    //   isGlobal: true,
-    // }),
+    CacheModule.register({
+      //store: redisStore,
+      // host: 'localhost',
+      // port: 6379,
+      isGlobal: true,
+      ttl: 600 * 1000, 
+    }),
     DatabaseModule,
     DevicesModule,
     AdafruitModule,

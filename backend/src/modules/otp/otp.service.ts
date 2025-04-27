@@ -1,44 +1,55 @@
 import {
   BadRequestException,
+  HttpStatus,
   Inject,
   Injectable,
   Logger,
 } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { randomInt } from 'crypto';
-import { Novu } from '@novu/node';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { OTP_REPOSITORY } from '@common/constants';
-import { IOtpRepository } from './repositories/otp.repository.interface';
-import { Otp } from 'database/entities/otp.entity';
 import { OtpStatus } from '@common/enums';
+import { OTP_TTL } from '@common/constants';
+import { AppError } from '@common/dtos/errorResponse.dto';
 
 @Injectable()
 export class OtpService {
+  private readonly logger = new Logger(OtpService.name);
+
   constructor(
-    @Inject(OTP_REPOSITORY)
-    private readonly otpRepository: IOtpRepository,
+    @Inject(CACHE_MANAGER)
+    private readonly cacheManager: Cache,
   ) {}
 
-  async createOtp(phone: string): Promise<Otp> {
+  async createOtp(phone: string): Promise<string> {
     const code = this.generateOtpCode();
 
-    const newOtp = this.otpRepository.create({
-      phone,
+    const otpData = {
       code,
       status: OtpStatus.Pending,
       attempts: 0,
       resendCount: 0,
-    });
+    };
 
-    return this.otpRepository.save(newOtp);
+    await this.cacheManager.set(`otp:${phone}`, otpData);
+
+    return code;
   }
 
-  async verifyOtpCode(phone: string, inputCode: string): Promise<OtpStatus> {
-    const otp = await this.findActiveOtpByPhone(phone);
+  async verifyOtpCode(phone: string, inputCode: string) {
+    const otp = await this.cacheManager.get<{
+      code: string;
+      status: OtpStatus;
+      attempts: number;
+      resendCount: number;
+    }>(`otp:${phone}`);
 
     if (!otp) {
-      throw new BadRequestException('OTP không tồn tại hoặc đã hết hạn.');
+      throw new AppError(
+        HttpStatus.BAD_REQUEST,
+        "OTP không tồn tại hoặc đã hết hạn.",
+        "OTP_NOT_FOUND"
+      )
     }
 
     if (otp.status === OtpStatus.Blocked) return OtpStatus.Blocked;
@@ -48,17 +59,22 @@ export class OtpService {
       if (otp.attempts >= 3) {
         otp.status = OtpStatus.Blocked;
       }
-      await this.otpRepository.save(otp);
+      await this.cacheManager.set(`otp:${phone}`, otp, OTP_TTL);
       return otp.status;
     }
 
     otp.status = OtpStatus.Verified;
-    await this.otpRepository.save(otp);
+    await this.cacheManager.set(`otp:${phone}`, otp, OTP_TTL);
     return otp.status;
   }
 
-  async renewOrCreateOtp(phone: string): Promise<Otp> {
-    let otp = await this.findActiveOtpByPhone(phone);
+  async renewOrCreateOtp(phone: string): Promise<string> {
+    let otp = await this.cacheManager.get<{
+      code: string;
+      status: OtpStatus;
+      attempts: number;
+      resendCount: number;
+    }>(`otp:${phone}`);
 
     const newCode = this.generateOtpCode();
 
@@ -68,31 +84,25 @@ export class OtpService {
       otp.attempts = 0;
       otp.resendCount = (otp.resendCount || 0) + 1;
     } else {
-      otp = this.otpRepository.create({
-        phone,
+      otp = {
         code: newCode,
         status: OtpStatus.Pending,
         attempts: 0,
         resendCount: 1,
-      });
+      };
     }
 
-    return this.otpRepository.save(otp);
+    const result = await this.cacheManager.set(`otp:${phone}`, otp, OTP_TTL);
+
+    return newCode;
   }
 
   async sendOtpToPhone(phone: string, otp: string): Promise<void> {
     // Tích hợp SMS provider ở đây (Novu, Twilio,...)
-    console.log(`[OTP] Gửi OTP tới ${phone}: ${otp}`);
+    this.logger.log(`[OTP] Gửi OTP tới ${phone}: ${otp}`);
   }
 
   private generateOtpCode(): string {
     return randomInt(100000, 999999).toString();
   }
-
-  private async findActiveOtpByPhone(phone: string): Promise<Otp | null> {
-    return this.otpRepository.findOtpActiveByPhone(phone);
-  }
-
-  
 }
-

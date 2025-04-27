@@ -3,7 +3,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Device } from './entities/device.entity';
 import { DB_NAME_DEVELOPMENT, DB_PASS, DB_USER } from '@environments';
 import { User } from './entities/user.entity';
-import { Otp } from './entities/otp.entity';
 
 
 @Module({

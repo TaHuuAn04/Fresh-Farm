@@ -3,6 +3,7 @@ import {
   BadRequestException,
   UnauthorizedException,
   NotFoundException,
+  HttpStatus,
 } from '@nestjs/common';
 import { RegisterDto } from './dtos/register.dto';
 import { OtpService } from '../otp/otp.service';
@@ -23,6 +24,7 @@ import {
 } from '@environments';
 import { MailService } from '@modules/mail/mail.service';
 import { SendOtpDto } from '@modules/mail/dto/sendOtp.dto';
+import { AppError } from '@common/dtos/errorResponse.dto';
 
 @Injectable()
 export class AuthService {
@@ -42,7 +44,7 @@ export class AuthService {
       //await this.otpService.sendOtpToPhone(dto.phoneNumber, otp.code);
       const sendOtpDto: SendOtpDto = {
         email: dto.email,
-        code: otp.code,
+        code: otp,
         name: dto.fullName,
       };
       await this.mailService.sendOtp(sendOtpDto);
@@ -53,23 +55,42 @@ export class AuthService {
     }
   }
 
-  async verifyOtp(dto: VerifyOtpDto): Promise<{ message: string }> {
-    const { phoneNumber, otp } = dto;
+  async verifyOtp(dto: VerifyOtpDto) {
+    try {
+      const { phoneNumber, otp } = dto;
 
-    const otpStatus = await this.otpService.verifyOtpCode(phoneNumber, otp);
+      const otpStatus = await this.otpService.verifyOtpCode(phoneNumber, otp);
 
-    if (otpStatus === OtpStatus.Blocked) {
-      await this.usersService.blockUserByPhone(phoneNumber);
-      throw new BadRequestException('Sai OTP quá số lần. Tài khoản bị khóa.');
+      if (otpStatus === OtpStatus.Blocked) {
+        await this.usersService.blockUserByPhone(phoneNumber);
+        throw new AppError(
+          HttpStatus.BAD_REQUEST,
+          'Sai OTP quá số lần. Tài khoản bị khóa.',
+          'OTP_REACH_LIMIT',
+        );
+      }
+
+      if (otpStatus !== OtpStatus.Verified) {
+        throw new AppError(
+          HttpStatus.BAD_REQUEST,
+          'Mã OTP không chính xác.',
+          'OTP_REACH_LIMIT',
+        );
+      }
+
+      await this.usersService.verifyUserByPhone(phoneNumber);
+
+      return { message: 'Xác minh OTP thành công.' };
+    } catch (error) {
+      if (error instanceof AppError) {
+        throw error;
+      }
+      throw new AppError(
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        'Xảy ra lỗi khi xác thực người dùng',
+        'VERIFY_USER_ERROR',
+      );
     }
-
-    if (otpStatus !== OtpStatus.Verified) {
-      throw new BadRequestException('Mã OTP không chính xác.');
-    }
-
-    await this.usersService.verifyUserByPhone(phoneNumber);
-
-    return { message: 'Xác minh OTP thành công.' };
   }
 
   async resendOtpToUser(dto: ResendOtpDto): Promise<{ message: string }> {
@@ -79,11 +100,9 @@ export class AuthService {
 
     const updatedOtp = await this.otpService.renewOrCreateOtp(phoneNumber);
 
-    //await this.otpService.sendOtpToPhone(phoneNumber, updatedOtp.code);
-
     const sendOtpDto: SendOtpDto = {
       email: user.email,
-      code: updatedOtp.code,
+      code: updatedOtp,
       name: user.fullName,
     };
     await this.mailService.sendOtp(sendOtpDto);
@@ -94,11 +113,10 @@ export class AuthService {
   async requestForgotPassword(dto: RequestForgotPasswordDto) {
     const user = await this.usersService.getUserForOtpResend(dto.phoneNumber);
     const otp = await this.otpService.createOtp(dto.phoneNumber);
-    // await this.otpService.sendOtpToPhone(dto.phoneNumber, otp.code);
 
     const sendOtpDto: SendOtpDto = {
       email: user.email,
-      code: otp.code,
+      code: otp,
       name: user.fullName,
     };
     await this.mailService.sendOtp(sendOtpDto);
