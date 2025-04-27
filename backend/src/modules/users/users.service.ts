@@ -14,6 +14,7 @@ import { CreateUserDto } from './dtos/createUser.dto';
 import { User } from 'database/entities/user.entity';
 import * as bcrypt from 'bcryptjs';
 import { UserStatus } from '@common/enums';
+import { UpdateUserDto } from './dtos/updateUser.dto';
 
 @Injectable()
 export class UsersService {
@@ -160,5 +161,59 @@ export class UsersService {
     }
 
     return null;
+  }
+
+  async update(id: string, updateDto: UpdateUserDto) {
+    try {
+      const user = await this.usersRepository.findOneById(id);
+      console.log(user);
+
+      if (!user) {
+        throw new AppError(
+          HttpStatus.NOT_FOUND,
+          'User not found',
+          'USER_NOT_FOUND',
+        );
+      }
+      for (const key in updateDto) {
+        if (updateDto[key] !== undefined) {
+          user[key] = updateDto[key];
+        }
+      }
+      return this.usersRepository.save(user);
+    } catch (error) {
+      console.log(error);
+      throw new AppError(
+        HttpStatus.NOT_FOUND,
+        'Xảy ra lỗi khi chỉnh sửa thông tin người dùng',
+        'USER_UPDATED_FAIL',
+      );
+    }
+  }
+
+  async getAll() {
+    return this.usersRepository.find();
+  }
+
+  async delete(id: string) {
+    try {
+      const user = await this.findById(id);
+
+      if (!user) {
+        throw new AppError(
+          HttpStatus.NOT_FOUND,
+          'User not found',
+          'USER_NOT_FOUND',
+        );
+      }
+
+      await this.usersRepository.remove(user);
+    } catch (error) {
+      throw new AppError(
+        HttpStatus.NOT_FOUND,
+        'Xảy ra lỗi khi xóa người dùng',
+        'USER_DELETE_FAIL',
+      );
+    }
   }
 }

@@ -6,5 +6,5 @@ export interface IUsersRepository {
   find(): Promise<User[]>;
   findOneById(id: string): Promise<User | null>;
   findOneByPhoneNumber(phoneNumber: string): Promise<User | null>;
-  remove(User: User): Promise<void>;
+  remove(User: User | null): Promise<void>;
 }
