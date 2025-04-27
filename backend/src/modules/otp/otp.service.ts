@@ -92,5 +92,7 @@ export class OtpService {
   private async findActiveOtpByPhone(phone: string): Promise<Otp | null> {
     return this.otpRepository.findOtpActiveByPhone(phone);
   }
+
+  
 }
 

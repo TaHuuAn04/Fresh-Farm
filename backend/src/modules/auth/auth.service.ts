@@ -15,7 +15,14 @@ import { ResetPasswordDto } from './dtos/reset-password.dto';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dtos/login.dto';
 import * as bcrypt from 'bcryptjs';
-import { JWT_ACCESS_TOKEN_EXPIRATION_TIME, JWT_ACCESS_TOKEN_SECRET, JWT_REFRESH_TOKEN_EXPIRATION_TIME, JWT_REFRESH_TOKEN_SECRET } from '@environments';
+import {
+  JWT_ACCESS_TOKEN_EXPIRATION_TIME,
+  JWT_ACCESS_TOKEN_SECRET,
+  JWT_REFRESH_TOKEN_EXPIRATION_TIME,
+  JWT_REFRESH_TOKEN_SECRET,
+} from '@environments';
+import { MailService } from '@modules/mail/mail.service';
+import { SendOtpDto } from '@modules/mail/dto/sendOtp.dto';
 
 @Injectable()
 export class AuthService {
@@ -23,14 +30,27 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly otpService: OtpService,
     private jwtService: JwtService,
+    private readonly mailService: MailService,
   ) {}
 
-  async registerUser(dto: RegisterDto): Promise<void> {
-    await this.usersService.ensurePhoneNumberNotTaken(dto.phoneNumber);
-    await this.usersService.createUser(dto);
+  async registerUser(dto: RegisterDto) {
+    try {
+      await this.usersService.ensurePhoneNumberNotTaken(dto.phoneNumber);
+      await this.usersService.createUser(dto);
 
-    const otp = await this.otpService.createOtp(dto.phoneNumber);
-    await this.otpService.sendOtpToPhone(dto.phoneNumber, otp.code);
+      const otp = await this.otpService.createOtp(dto.phoneNumber);
+      //await this.otpService.sendOtpToPhone(dto.phoneNumber, otp.code);
+      const sendOtpDto: SendOtpDto = {
+        email: dto.email,
+        code: otp.code,
+        name: dto.fullName,
+      };
+      await this.mailService.sendOtp(sendOtpDto);
+
+      return { message: 'Mã OTP đã được gửi.' };
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async verifyOtp(dto: VerifyOtpDto): Promise<{ message: string }> {
@@ -59,7 +79,14 @@ export class AuthService {
 
     const updatedOtp = await this.otpService.renewOrCreateOtp(phoneNumber);
 
-    await this.otpService.sendOtpToPhone(phoneNumber, updatedOtp.code);
+    //await this.otpService.sendOtpToPhone(phoneNumber, updatedOtp.code);
+
+    const sendOtpDto: SendOtpDto = {
+      email: user.email,
+      code: updatedOtp.code,
+      name: user.fullName,
+    };
+    await this.mailService.sendOtp(sendOtpDto);
 
     return { message: 'Mã OTP mới đã được gửi.' };
   }
@@ -67,7 +94,14 @@ export class AuthService {
   async requestForgotPassword(dto: RequestForgotPasswordDto) {
     const user = await this.usersService.getUserForOtpResend(dto.phoneNumber);
     const otp = await this.otpService.createOtp(dto.phoneNumber);
-    await this.otpService.sendOtpToPhone(dto.phoneNumber, otp.code);
+    // await this.otpService.sendOtpToPhone(dto.phoneNumber, otp.code);
+
+    const sendOtpDto: SendOtpDto = {
+      email: user.email,
+      code: otp.code,
+      name: user.fullName,
+    };
+    await this.mailService.sendOtp(sendOtpDto);
 
     return { message: 'Mã OTP đã được gửi đến số điện thoại của bạn.' };
   }
@@ -117,7 +151,7 @@ export class AuthService {
   getCookiesForLogOut() {
     return [
       'Authentication=; HttpOnly; Path=/; Max-Age=0',
-      'Refresh=; HttpOnly; Path=/; Max-Age=0'
+      'Refresh=; HttpOnly; Path=/; Max-Age=0',
     ];
   }
 

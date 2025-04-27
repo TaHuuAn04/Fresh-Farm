@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { DatabaseModule } from 'database/database.module';
 import { DevicesModule } from '@modules/devices/devices.module';
 import { AdafruitModule } from './modules/adafruit/adafruit.module';
@@ -9,9 +8,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { WinstonModule } from 'nest-winston';
 import { CONFIG_KEY } from './config/config-key';
 import loggerConfig from './config/logger/log.config';
-import { CacheModule } from '@nestjs/cache-manager';
-import { redisStore } from 'cache-manager-ioredis';
 import { AuthModule } from '@modules/auth/auth.module';
+//import { BullModule } from '@nestjs/bull';
+import { MailModule } from '@modules/mail/mail.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -25,6 +25,12 @@ import { AuthModule } from '@modules/auth/auth.module';
         transports: configService.get(CONFIG_KEY.LOGGER).transports,
       }),
     }),
+    // BullModule.forRoot({
+    //   redis: {
+    //     host: 'localhost',
+    //     port: 6379,
+    //   },
+    // }),
     // CacheModule.registerAsync({
     //   useFactory: async () => ({
     //     store: await redisStore({
@@ -36,7 +42,8 @@ import { AuthModule } from '@modules/auth/auth.module';
     DatabaseModule,
     DevicesModule,
     AdafruitModule,
-    AuthModule
+    AuthModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -42,6 +42,10 @@ export class User {
   })
   role: UserRole;
 
-  @OneToMany(() => Device, device => device.owner)
+  @OneToMany(() => Device, (device) => device.owner)
   devices: Device[];
+
+  // Thêm trường email
+  @Column({ type: 'varchar', length: 255, unique: true, nullable: true })
+  email: string;
 }
