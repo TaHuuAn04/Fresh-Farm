@@ -117,9 +117,15 @@ export class UsersService {
   }
 
   async findById(id: string): Promise<User | null> {
-    const user = await this.usersRepository.findOneById(id);
+    try {
+      console.log(`Đang tìm kiếm thông tin người dùng ${id}...`)
+      const user = await this.usersRepository.findOneById(id);
 
-    return user;
+      return user;
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
   }
 
   private getRefreshTokenFromCookie(cookieStr) {

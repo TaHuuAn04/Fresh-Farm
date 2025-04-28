@@ -190,4 +190,14 @@ export class AuthService {
     });
     return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${JWT_ACCESS_TOKEN_EXPIRATION_TIME}`;
   }
+
+  async getMe(userId: string) {
+    try {
+      console.log(`Đang tìm kiếm thông tin ${userId}...`);
+      return await this.usersService.findById(userId);
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
 }

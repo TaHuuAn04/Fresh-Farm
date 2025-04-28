@@ -69,7 +69,14 @@ export class AuthController {
 
     response.setHeader('Set-Cookie', [accessTokenCookie, refreshTokenCookie]);
     user.password = undefined;
-    return response.send(user);
+
+    const res = {
+      statusCode: 200,
+      message: 'Thành công',
+      data: user,
+    };
+
+    return response.send(res);
   }
 
   @UseGuards(JwtAuth)
@@ -77,7 +84,14 @@ export class AuthController {
   async logOut(@Req() request: RequestWithUser, @Res() response: Response) {
     await this.usersService.removeRefreshToken(request.user.id);
     response.setHeader('Set-Cookie', this.authService.getCookiesForLogOut());
-    return response.sendStatus(200);
+
+    const res = {
+      statusCode: 200,
+      message: 'Thành công',
+      data: null,
+    };
+
+    return response.send(res);
   }
 
   @UseGuards(JwtRefreshGuard)
@@ -89,6 +103,29 @@ export class AuthController {
     );
 
     response.setHeader('Set-Cookie', accessTokenCookie);
-    return response.send(request.user);
+
+    const res = {
+      statusCode: 200,
+      message: 'Thành công',
+      data: request.user,
+    };
+
+    response.send(res);
+
+    return response.send(res);
+  }
+
+  @UseGuards(JwtAuth)
+  @Get('me')
+  async getMe(@Req() request: RequestWithUser, @Res() response: Response) {
+    const user = await this.authService.getMe(request.user.id);
+
+    const res = {
+      statusCode: 200,
+      message: 'Thành công',
+      data: user,
+    };
+
+    response.send(res);
   }
 }
