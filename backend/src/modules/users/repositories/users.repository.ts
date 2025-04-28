@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from 'database/entities/user.entity';
 import { IUsersRepository } from './users.repository.interface';
+import { AppError } from '@common/dtos/errorResponse.dto';
 
 @Injectable()
 export class UserRepository implements IUsersRepository {
@@ -27,8 +28,16 @@ export class UserRepository implements IUsersRepository {
     return this.repo.findOne({ where: { id } });
   }
 
-  async findOneByPhoneNumber(phone: string): Promise<User | null> {
-    return this.repo.findOne({ where: { phoneNumber: phone } });
+  async findOneByField(field: string, value: string): Promise<User | null> {
+    const fields = ['email', 'phoneNumber'];
+    if (!fields.includes(field)) {
+      throw new AppError(
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        'Field cần query không hợp lệ',
+        'QUERY_ERROR',
+      );
+    }
+    return this.repo.findOne({ where: { [field]: value } });
   }
 
   async remove(User: User): Promise<void> {
