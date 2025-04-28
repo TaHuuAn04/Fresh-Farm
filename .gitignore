@@ -1,6 +1,6 @@
 # compiled output
 /dist
-/node_modules
+/node_modules/
 /build
 
 # Logs
@@ -51,12 +51,6 @@ pids
 *.pid
 *.seed
 *.pid.lock
-
-# python env
-.venv
-venv311/
-__pycache__/
-
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json

@@ -1,28 +1,27 @@
-name:
+name: DoAn-TTNT
 services:
   postgres:
     image: postgres:14
-    container_name:
+    container_name: DoAn-TTNT
     restart: always
     ports:
-      -
+      - 5433:5432
     healthcheck:
-      test: ['CMD', 'pg_isready', '-U', '']
-      interval:
-      timeout:
-      retries:
+      interval: 30s
+      timeout: 20s
+      retries: 3
     environment:
-      POSTGRES_DB:
-      POSTGRES_USER:
-      POSTGRES_PASSWORD:
+      POSTGRES_DB: blog-cooking
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
 
   redis:
     image: redis
-    container_name:
+    container_name: DoAn-TTNT-redis
     ports:
-      -
+      - 6368:6379
     healthcheck:
       test: ['CMD', 'redis-cli', 'ping']
-      interval:
-      timeout:
-      retries:
+      interval: 10s
+      timeout: 30s
+      retries: 3
