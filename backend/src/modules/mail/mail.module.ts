@@ -1,10 +1,10 @@
 import { MailerModule } from '@nestjs-modules/mailer';
 import { Module } from '@nestjs/common';
 import { MailService } from './mail.service';
-//import { BullModule } from '@nestjs/bull';
+import { BullModule } from '@nestjs/bull';
 import { MailController } from './mail.controller';
 import { MAIL_PASS, MAIL_USER } from '@environments';
-// import { MailProcessor } from './mail.processor';
+import { MailProcessor } from './mail.processor';
 
 @Module({
   imports: [
@@ -29,14 +29,11 @@ import { MAIL_PASS, MAIL_USER } from '@environments';
       //   },
       // },
     }),
-    // BullModule.registerQueue({
-    //   name: 'emailQueue',
-    // }),
+    BullModule.registerQueue({
+      name: 'email',
+    }),
   ],
-  providers: [
-    MailService,
-    //MailProcessor
-  ],
+  providers: [MailService, MailProcessor],
   exports: [MailService],
   controllers: [MailController],
 })

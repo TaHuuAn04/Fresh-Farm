@@ -37,21 +37,41 @@ export class AuthService {
 
   async registerUser(dto: RegisterDto) {
     try {
-      await this.usersService.ensurePhoneNumberNotTaken(dto.phoneNumber);
+      const userWithPhone = await this.usersService.getUserByPhone(
+        dto.phoneNumber,
+      );
+      if (userWithPhone) {
+        throw new AppError(
+          HttpStatus.BAD_REQUEST,
+          'Số điện thoại đã được đăng ký',
+          'PHONE_EXIST',
+        );
+      }
+      const userWithEmail = await this.usersService.getUserByEmail(dto.email);
+      if (userWithEmail) {
+        throw new AppError(
+          HttpStatus.BAD_REQUEST,
+          'Địa chỉ email đã được đăng ký',
+          'EMAIL_EXIST',
+        );
+      }
+
       await this.usersService.createUser(dto);
 
       const otp = await this.otpService.createOtp(dto.phoneNumber);
-      //await this.otpService.sendOtpToPhone(dto.phoneNumber, otp.code);
       const sendOtpDto: SendOtpDto = {
         email: dto.email,
         code: otp,
         name: dto.fullName,
       };
-      await this.mailService.sendOtp(sendOtpDto);
+      await this.mailService.sendOtpQueue(sendOtpDto);
 
       return { message: 'Mã OTP đã được gửi.' };
     } catch (error) {
-      console.log(error);
+      const statusCode = error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR;
+      const messgae = error.message || 'Xảy ra lỗi trong quá trình đăng ký';
+
+      throw new AppError(statusCode, messgae, 'REGISTER_ERROR');
     }
   }
 
@@ -82,64 +102,85 @@ export class AuthService {
 
       return { message: 'Xác minh OTP thành công.' };
     } catch (error) {
-      if (error instanceof AppError) {
-        throw error;
-      }
-      throw new AppError(
-        HttpStatus.INTERNAL_SERVER_ERROR,
-        'Xảy ra lỗi khi xác thực người dùng',
-        'VERIFY_USER_ERROR',
-      );
+      const statusCode = error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR;
+      const messgae = error.message || 'Xảy ra lỗi trong quá trình xác thực';
+
+      throw new AppError(statusCode, messgae, 'VERIFY_USER_ERROR');
     }
   }
 
   async resendOtpToUser(dto: ResendOtpDto): Promise<{ message: string }> {
-    const { phoneNumber } = dto;
+    try {
+      const { phoneNumber } = dto;
 
-    const user = await this.usersService.getUserForOtpResend(phoneNumber);
+      const user = await this.usersService.getUserForOtpResend(phoneNumber);
 
-    const updatedOtp = await this.otpService.renewOrCreateOtp(phoneNumber);
+      const updatedOtp = await this.otpService.renewOrCreateOtp(phoneNumber);
 
-    const sendOtpDto: SendOtpDto = {
-      email: user.email,
-      code: updatedOtp,
-      name: user.fullName,
-    };
-    await this.mailService.sendOtp(sendOtpDto);
+      const sendOtpDto: SendOtpDto = {
+        email: user.email,
+        code: updatedOtp,
+        name: user.fullName,
+      };
+      await this.mailService.sendOtpQueue(sendOtpDto);
 
-    return { message: 'Mã OTP mới đã được gửi.' };
+      return { message: 'Mã OTP mới đã được gửi.' };
+    } catch (error) {
+      const statusCode = error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR;
+      const messgae = error.message || 'Xảy ra lỗi trong quá trình gửi OTP';
+
+      throw new AppError(statusCode, messgae, 'SEND_OTP_ERROR');
+    }
   }
 
   async requestForgotPassword(dto: RequestForgotPasswordDto) {
-    const user = await this.usersService.getUserForOtpResend(dto.phoneNumber);
-    const otp = await this.otpService.createOtp(dto.phoneNumber);
+    try {
+      const user = await this.usersService.getUserForOtpResend(dto.phoneNumber);
+      const otp = await this.otpService.createOtp(dto.phoneNumber);
 
-    const sendOtpDto: SendOtpDto = {
-      email: user.email,
-      code: otp,
-      name: user.fullName,
-    };
-    await this.mailService.sendOtp(sendOtpDto);
+      const sendOtpDto: SendOtpDto = {
+        email: user.email,
+        code: otp,
+        name: user.fullName,
+      };
+      await this.mailService.sendOtpQueue(sendOtpDto);
 
-    return { message: 'Mã OTP đã được gửi đến số điện thoại của bạn.' };
+      return { message: 'Mã OTP đã được gửi đến số điện thoại của bạn.' };
+    } catch (error) {
+      const statusCode = error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR;
+      const messgae = error.message || 'Xảy ra lỗi trong quá trình gửi OTP';
+
+      throw new AppError(statusCode, messgae, 'SEND_OTP_ERROR');
+    }
   }
 
   async resetPassword(dto: ResetPasswordDto) {
-    const user = await this.usersService.getUserByPhone(dto.phoneNumber);
+    try {
+      const user = await this.usersService.getUserByPhone(dto.phoneNumber);
 
-    if (!user || user.status !== UserStatus.Active) {
-      throw new BadRequestException(
-        'Người dùng không hợp lệ hoặc chưa xác minh.',
-      );
+      if (!user || user.status !== UserStatus.Active) {
+        throw new BadRequestException(
+          'Người dùng không hợp lệ hoặc chưa xác minh.',
+        );
+      }
+
+      await this.usersService.updatePassword(dto.phoneNumber, dto.newPassword);
+      return { message: 'Mật khẩu đã được cập nhật.' };
+    } catch (error) {
+      const statusCode = error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR;
+      const messgae =
+        error.message || 'Xảy ra lỗi trong quá trình đổi mật khẩu';
+
+      throw new AppError(statusCode, messgae, 'RESET_PASSWORD_ERROR');
     }
-
-    await this.usersService.updatePassword(dto.phoneNumber, dto.newPassword);
-    return { message: 'Mật khẩu đã được cập nhật.' };
   }
 
   async getAuthenticatedUser(phoneNumber, password) {
     try {
       const user = await this.usersService.getUserByPhone(phoneNumber);
+      if (!user) {
+        return null;
+      }
       await this.verifyPassword(password, user?.password);
       user.password = undefined;
       return user;
@@ -193,11 +234,13 @@ export class AuthService {
 
   async getMe(userId: string) {
     try {
-      console.log(`Đang tìm kiếm thông tin ${userId}...`);
       return await this.usersService.findById(userId);
     } catch (error) {
-      console.log(error);
-      return null;
+      const statusCode = error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR;
+      const messgae =
+        error.message || 'Xảy ra lỗi trong quá trình lấy thông tin người dùng';
+
+      throw new AppError(statusCode, messgae, 'GET_ME_ERROR');
     }
   }
 }

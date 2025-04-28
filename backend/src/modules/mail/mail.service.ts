@@ -1,36 +1,18 @@
-import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
 import { SendOtpDto } from './dto/sendOtp.dto';
-import { otpEmailTemplate } from './templates/welcome.template';
-//import { InjectQueue } from '@nestjs/bull';
+import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 
 @Injectable()
 export class MailService {
   constructor(
-    private mailerService: MailerService,
-    //@InjectQueue('mailQueue') private mailQueue: Queue,
+    @InjectQueue('email') private emailQueue: Queue,
   ) {}
 
-  async sendOtp(sendOtpDto: SendOtpDto) {
-    const emailBody = otpEmailTemplate(sendOtpDto.name, sendOtpDto.code);
-
-    await this.mailerService.sendMail({
-      from: '"Hệ thống FreshFarm" <no-reply@freshfarm.com>', // Địa chỉ email và tên người gửi
-      to: sendOtpDto.email,
-      subject: 'THÔNG BÁO FRESHFARM',
-      html: emailBody,
+  async sendOtpQueue(sendOtpDto: SendOtpDto) {
+    await this.emailQueue.add('send-email', sendOtpDto, {
+      delay: 1000, // optional: delay 1 giây
+      attempts: 3, // optional: thử lại 3 lần nếu fail
     });
   }
-
-  // async sendOtp(sendOtpDto: SendOtpDto) {
-  //   const emailBody = otpEmailTemplate(sendOtpDto.name, sendOtpDto.code);
-
-  //   await this.mailQueue.add('sendOtp', {
-  //     sendOtpDto: {
-  //       ...sendOtpDto,
-  //       html: emailBody,
-  //     },
-  //   });
-  // }
 }
