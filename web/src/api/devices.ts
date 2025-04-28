@@ -3,13 +3,12 @@ import {
   ToggleDeviceDto,
   UpdateDeviceDto,
 } from "@/utils/constant";
-import axios, { AxiosError } from "axios";
-
-const BASE_URL = `${process.env.NEXT_PUBLIC_BE_URL}/devices`;
+import axios from "axios";
+import axiosInstance from "./axios-interceptor.api";
 
 export async function getAllDevices() {
   try {
-    const res = await axios.get(BASE_URL);
+    const res = await axiosInstance.get("/devices");
     return res?.data;
   } catch (error) {
     console.log("Error when get all devices", error);
@@ -19,7 +18,7 @@ export async function getAllDevices() {
 
 export async function getDevice(id: string) {
   try {
-    const res = await axios.get(`${BASE_URL}/${id}`);
+    const res = await axiosInstance.get(`/devices/${id}`);
     // console.log("res", res);
 
     return res?.data;
@@ -31,7 +30,7 @@ export async function getDevice(id: string) {
 
 export async function createDevice(createDeviceDto: CreateDeviceDto) {
   try {
-    const res = await axios.post(BASE_URL, createDeviceDto);
+    const res = await axiosInstance.post("/devices", createDeviceDto);
     return res?.data;
   } catch (error) {
     console.log("Error when calling createDevice", error);
@@ -44,7 +43,7 @@ export async function updateDevice(
   updateDeviceDto: UpdateDeviceDto
 ) {
   try {
-    const res = await axios.patch(`${BASE_URL}/${id}`, updateDeviceDto);
+    const res = await axiosInstance.patch(`/devices/${id}`, updateDeviceDto);
     return res?.data;
   } catch (error) {
     console.log("Error when calling updateDevice", error);
@@ -57,7 +56,10 @@ export async function toggleDevice(
   toggleDeviceDto: ToggleDeviceDto
 ) {
   try {
-    const res = await axios.patch(`${BASE_URL}/${id}/toggle`, toggleDeviceDto);
+    const res = await axiosInstance.patch(
+      `/devices/${id}/toggle`,
+      toggleDeviceDto
+    );
     return res?.data;
   } catch (error) {
     console.log("Error when calling toggleDevice", error);
@@ -67,7 +69,7 @@ export async function toggleDevice(
 
 export async function deleteDevice(id: string) {
   try {
-    const res = await axios.delete(`${BASE_URL}/${id}`);
+    const res = await axiosInstance.delete(`/devices/${id}`);
     return res?.data;
   } catch (error) {
     console.log("Error when calling deleteDevice", error);

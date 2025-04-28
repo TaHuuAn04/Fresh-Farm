@@ -17,6 +17,7 @@ export default function RegisterForm() {
   const [fullName, setFullName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
   const [verifyPassword, setVerifyPassword] = useState("");
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [isRegistered, setIsRegistered] = useState(false);
@@ -38,6 +39,7 @@ export default function RegisterForm() {
       fullName,
       phoneNumber,
       password,
+      email,
     };
 
     setIsVerifying(true);
@@ -181,6 +183,13 @@ export default function RegisterForm() {
             placeholder="Số điện thoại"
             value={phoneNumber}
             onChange={(e) => setPhoneNumber(e.target.value)}
+            required
+          />
+          <Input
+            type="text"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
           <Input

@@ -23,6 +23,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import { updateUser } from "@/api/user.api";
 
 const profileFormSchema = z.object({
   fullName: z
@@ -37,6 +40,7 @@ const profileFormSchema = z.object({
     .refine((val) => Number.parseInt(val) >= 0 && Number.parseInt(val) <= 120, {
       message: "Age must be between 0 and 120.",
     }),
+  email: z.string().email({ message: "Invalid email address." }).optional(),
   phoneNumber: z
     .string()
     .min(10, { message: "Phone number must be at least 10 digits." })
@@ -49,14 +53,16 @@ const profileFormSchema = z.object({
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
-const defaultValues: ProfileFormValues = {
-  fullName: "John Doe",
-  age: "30",
-  phoneNumber: "0123456789",
-};
-
 export default function ProfileForm() {
   const [isLoading, setIsLoading] = useState(false);
+  const user = useSelector((state: RootState) => state.user);
+
+  const defaultValues: ProfileFormValues = {
+    fullName: user?.fullName || "John Doe",
+    age: user?.age ? String(user.age) : "30",
+    email: user?.email || "",
+    phoneNumber: user?.phoneNumber || "0123456789",
+  };
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
@@ -64,94 +70,124 @@ export default function ProfileForm() {
   });
 
   // Handle form submission
-  function onSubmit(data: ProfileFormValues) {
+  async function onSubmit(data: ProfileFormValues) {
     setIsLoading(true);
-
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      // Call the updateUser API with the form data
+      // const response = await updateUser({
+      //   ...data,
+      //   age: Number(data.age), // Convert age back to number if API expects a number
+      // }, 'ádvádv');
       console.log(data);
-      setIsLoading(false);
-      toast.success("success", {
+
+      // Assuming updateUser returns a success response
+      toast.success("Success", {
         description: "Your profile information has been updated successfully.",
       });
-    }, 1000);
+
+      // Optionally, you can reset the form or update Redux state here
+      console.log("Updated user data:", response);
+    } catch (error) {
+      // Handle API errors
+      toast.error("Error", {
+        description: "Failed to update profile. Please try again.",
+      });
+      console.error("Update user error:", error);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
-    <>
-      <Card>
-        <CardHeader>
-          <CardTitle>Personal Information</CardTitle>
-          <CardDescription>
-            Update your personal details here. This information will be
-            displayed publicly.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="fullName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Full Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter your full name" {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      This is your public display name.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+    <Card>
+      <CardHeader>
+        <CardTitle>Personal Information</CardTitle>
+        <CardDescription>
+          Update your personal details here. This information will be displayed
+          publicly.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="fullName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Full Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter your full name" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    This is your public display name.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              <FormField
-                control={form.control}
-                name="age"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Age</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        placeholder="Enter your age"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Your age must be between 0 and 120.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <FormField
+              control={form.control}
+              name="age"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Age</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      placeholder="Enter your age"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Your age must be between 0 and 120.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              <FormField
-                control={form.control}
-                name="phoneNumber"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Phone Number</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter your phone number" {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      Your contact phone number.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="email"
+                      placeholder="Enter your email"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription>Your contact email address.</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Saving..." : "Save Changes"}
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
-    </>
+            <FormField
+              control={form.control}
+              name="phoneNumber"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Phone Number</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter your phone number" {...field} />
+                  </FormControl>
+                  <FormDescription>Your contact phone number.</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Saving..." : "Save Changes"}
+            </Button>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
   );
 }

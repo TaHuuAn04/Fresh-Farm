@@ -28,10 +28,15 @@ export default function LoginForm() {
         description: "Đăng nhập thành công",
       });
 
+      console.log(response);
+
       dispatch(
         changeState({
           fullName: response?.data?.fullName,
           role: response?.data?.role,
+          age: response?.data?.age,
+          phoneNumber: response?.data?.phoneNumber,
+          email: response?.data?.email,
         })
       );
       setInterval(async () => {

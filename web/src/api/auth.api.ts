@@ -5,12 +5,11 @@ import {
   VerifyOTPType,
 } from "@/utils/constant";
 import axios from "axios";
-
-const BASE_URL = `${process.env.NEXT_PUBLIC_BE_URL}/auth`;
+import axiosInstance from "./axios-interceptor.api";
 
 export async function register(payload: RegisterType) {
   try {
-    const res = await axios.post(`${BASE_URL}/register`, payload);
+    const res = await axiosInstance.post(`/auth/register`, payload);
     return res?.data;
   } catch (error) {
     console.log("Error when get all devices", error);
@@ -20,7 +19,7 @@ export async function register(payload: RegisterType) {
 
 export async function verifyOTP(data: VerifyOTPType) {
   try {
-    const res = await axios.post(`${BASE_URL}/otp/verify`, data);
+    const res = await axiosInstance.post(`/auth/otp/verify`, data);
     console.log(res);
 
     return res?.data;
@@ -32,7 +31,7 @@ export async function verifyOTP(data: VerifyOTPType) {
 
 export async function requestForgotPassword(phoneNumber: string) {
   try {
-    const res = await axios.post(`${BASE_URL}/forgot-password/request`, {
+    const res = await axiosInstance.post(`/auth/forgot-password/request`, {
       phoneNumber,
     });
     console.log(res);
@@ -45,7 +44,7 @@ export async function requestForgotPassword(phoneNumber: string) {
 
 export async function resendOTP(phoneNumber: string) {
   try {
-    const res = await axios.post(`${BASE_URL}/otp/resend`, {
+    const res = await axiosInstance.post(`/auth/otp/resend`, {
       phoneNumber,
     });
     console.log(res);
@@ -58,7 +57,7 @@ export async function resendOTP(phoneNumber: string) {
 
 export async function requestResetPassword(data: ResetPasswordRequest) {
   try {
-    const res = await axios.post(`${BASE_URL}/forgot-password/reset`, data);
+    const res = await axiosInstance.post(`/auth/forgot-password/reset`, data);
     console.log(res);
     return res?.data;
   } catch (error) {
@@ -69,7 +68,7 @@ export async function requestResetPassword(data: ResetPasswordRequest) {
 
 export async function login(data: LoginDto) {
   try {
-    const res = await axios.post(`${BASE_URL}/log-in`, data);
+    const res = await axiosInstance.post(`/auth/log-in`, data);
     console.log("reds", res);
     return res;
   } catch (error) {
@@ -80,7 +79,7 @@ export async function login(data: LoginDto) {
 
 export async function refresh() {
   try {
-    const res = await axios(`${BASE_URL}/refresh`);
+    const res = await axiosInstance.get(`/auth/refresh`);
     console.log(res);
     return res?.data;
   } catch (error) {
@@ -91,7 +90,7 @@ export async function refresh() {
 
 export async function logout() {
   try {
-    const res = await axios.post(`${BASE_URL}/log-out`);
+    const res = await axiosInstance.post(`/auth/log-out`);
     console.log(res);
     return res;
   } catch (error) {

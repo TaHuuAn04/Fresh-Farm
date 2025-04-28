@@ -1,5 +1,8 @@
 import { getDevice } from "@/api/devices";
 import { redirect } from "next/navigation";
+import { lazy, Suspense } from "react";
+
+const HomeComp = lazy(() => import("../../../components/home/home"));
 
 export default function HomePage() {
   async function firstFetchHumid() {
@@ -11,5 +14,9 @@ export default function HomePage() {
   }
 
   firstFetchHumid();
-  return <div>asdf</div>;
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <HomeComp />
+    </Suspense>
+  );
 }

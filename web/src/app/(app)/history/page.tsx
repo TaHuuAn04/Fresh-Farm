@@ -1,5 +1,8 @@
 import { getDevice } from "@/api/devices";
 import { redirect } from "next/navigation";
+import { lazy, Suspense } from "react";
+
+const HistoryComp = lazy(() => import("../../../components/history/history"));
 
 export default function HistoryPage() {
   async function firstFetchHumid() {
@@ -11,5 +14,9 @@ export default function HistoryPage() {
   }
 
   firstFetchHumid();
-  return <div>asdf</div>;
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <HistoryComp />
+    </Suspense>
+  );
 }
