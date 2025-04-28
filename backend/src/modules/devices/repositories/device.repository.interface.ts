@@ -9,4 +9,5 @@ export interface IDeviceRepository {
   findOneById(id: string): Promise<Device | null>;
   remove(device: Device): Promise<void>;
   findOneByKey(key: string): Promise<Device | null>;
+  findDevicesByUserId(userId: string): Promise<Device[] | null>;
 }

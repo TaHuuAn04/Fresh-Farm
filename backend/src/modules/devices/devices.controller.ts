@@ -30,12 +30,19 @@ export class DevicesController {
   async create(@Body() createDeviceDto: CreateDeviceDto) {
     return this.devicesService.create(createDeviceDto);
   }
-  
+
   @UseGuards(JwtAuthGuard)
   @Get()
   @ApiOperation({ summary: 'Lấy danh sách tất cả thiết bị' })
   async findAll(@Req() request: RequestWithUser) {
     return this.devicesService.findAll();
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  @ApiOperation({ summary: 'Lấy danh sách tất cả thiết bị của người dùng' })
+  async findALlByUserId(@Req() request: RequestWithUser) {
+    return this.devicesService.findDevicesByUserId(request.user.id);
   }
 
   @Get(':id')
