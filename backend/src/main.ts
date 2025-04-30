@@ -11,8 +11,12 @@ import { BullAdapter } from '@bull-board/api/bullAdapter';
 import { ExpressAdapter } from '@bull-board/express';
 import { getQueueToken } from '@nestjs/bull';
 import { Queue } from 'bull';
+import { initializeTransactionalContext } from 'typeorm-transactional';
 
 async function bootstrap() {
+  // Initialize transactional context
+  await initializeTransactionalContext();
+
   const app = await NestFactory.create(AppModule);
   app.use(cookieParser());
 
@@ -24,17 +28,17 @@ async function bootstrap() {
     .setTitle('My API')
     .setDescription('API Documentation for My Project')
     .setVersion('1.0')
-    .addBearerAuth() 
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document); 
+  SwaggerModule.setup('api', app, document);
 
   // Global validation
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 
   app.useGlobalInterceptors(new GlobalResponseInterceptor());
-  app.useGlobalFilters(new GlobalExceptionFilter())
+  app.useGlobalFilters(new GlobalExceptionFilter());
 
   const emailQueue = app.get<Queue>(getQueueToken('email'));
 

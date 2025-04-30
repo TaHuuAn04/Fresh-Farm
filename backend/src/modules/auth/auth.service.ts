@@ -182,7 +182,6 @@ export class AuthService {
         return null;
       }
       await this.verifyPassword(password, user?.password);
-      user.password = undefined;
       return user;
     } catch (error) {
       throw new BadRequestException('Wrong credentials provided');

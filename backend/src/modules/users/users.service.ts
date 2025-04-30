@@ -97,10 +97,12 @@ export class UsersService {
       }
 
       // Nếu đã hết thời gian khóa, mở khóa tự động
-      user.status = UserStatus.Pending;
-      user.lastTimeBlocked = null;
+      if (user) {
+        user.status = UserStatus.Pending;
+        user.lastTimeBlocked = new Date(0); // Set to epoch time instead of null
 
-      await this.usersRepository.save(user);
+        await this.usersRepository.save(user);
+      }
     }
 
     return user;
@@ -151,7 +153,7 @@ export class UsersService {
 
   async unlockUser(user: User): Promise<void> {
     user.status = UserStatus.Pending;
-    user.lastTimeBlocked = null;
+    user.lastTimeBlocked = new Date(); // Changed from null to new Date()
     await this.usersRepository.save(user);
   }
 
@@ -193,7 +195,7 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException('Người dùng không tồn tại');
     }
-    user.refreshToken = null;
+    user.refreshToken = '';
     await this.usersRepository.save(user);
   }
 
