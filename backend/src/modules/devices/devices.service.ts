@@ -109,4 +109,9 @@ export class DevicesService {
     device.status = newStatus;
     return this.deviceRepository.save(device);
   }
+
+  async findDevicesByUserId(userId: string) {
+    const devices = await this.deviceRepository.findDevicesByUserId(userId);
+    return devices;
+  }
 }

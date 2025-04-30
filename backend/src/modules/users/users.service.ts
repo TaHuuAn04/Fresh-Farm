@@ -23,14 +23,6 @@ export class UsersService {
     private readonly usersRepository: IUsersRepository,
   ) {}
 
-  async ensurePhoneNumberNotTaken(phoneNumber: string): Promise<void> {
-    const existingUser =
-      await this.usersRepository.findOneByPhoneNumber(phoneNumber);
-    if (existingUser) {
-      throw new BadRequestException('Số điện thoại đã được sử dụng.');
-    }
-  }
-
   async createUser(dto: CreateUserDto): Promise<User> {
     const hashedPassword = await bcrypt.hash(dto.password, 10);
 
@@ -43,20 +35,51 @@ export class UsersService {
   }
 
   async verifyUserByPhone(phoneNumber: string): Promise<void> {
-    const user = await this.getUserByPhone(phoneNumber);
+    const user = await this.usersRepository.findOneByField(
+      'phoneNumber',
+      phoneNumber,
+    );
+    if (!user) {
+      throw new AppError(
+        HttpStatus.BAD_REQUEST,
+        'Người dùng không tồn tại',
+        'USER_NOT_FOUND',
+      );
+    }
     user.status = UserStatus.Active;
     await this.usersRepository.save(user);
   }
 
   async blockUserByPhone(phoneNumber: string): Promise<void> {
-    const user = await this.getUserByPhone(phoneNumber);
+    const user = await this.usersRepository.findOneByField(
+      'phoneNumber',
+      phoneNumber,
+    );
+    if (!user) {
+      throw new AppError(
+        HttpStatus.BAD_REQUEST,
+        'Người dùng không tồn tại',
+        'USER_NOT_FOUND',
+      );
+    }
+
     user.status = UserStatus.Banned;
     user.lastTimeBlocked = new Date();
     await this.usersRepository.save(user);
   }
 
   async getUserForOtpResend(phoneNumber: string): Promise<User> {
-    const user = await this.getUserByPhone(phoneNumber);
+    const user = await this.usersRepository.findOneByField(
+      'phoneNumber',
+      phoneNumber,
+    );
+    if (!user) {
+      throw new AppError(
+        HttpStatus.BAD_REQUEST,
+        'Người dùng không tồn tại',
+        'USER_NOT_FOUND',
+      );
+    }
 
     if (user.status === UserStatus.Banned) {
       const blockTime = user.lastTimeBlocked;
@@ -83,10 +106,23 @@ export class UsersService {
     return user;
   }
 
-  async getUserByPhone(phoneNumber: string): Promise<User> {
-    const user = await this.usersRepository.findOneByPhoneNumber(phoneNumber);
+  async getUserByPhone(phoneNumber: string): Promise<User | null> {
+    const user = await this.usersRepository.findOneByField(
+      'phoneNumber',
+      phoneNumber,
+    );
+
+    return user;
+  }
+
+  async getUserByEmail(email: string): Promise<User> {
+    const user = await this.usersRepository.findOneByField('email', email);
     if (!user) {
-      throw new BadRequestException('Không tìm thấy người dùng.');
+      throw new AppError(
+        HttpStatus.BAD_REQUEST,
+        'Không tìm thấy người dùng.',
+        'USER_NOT_FOUND',
+      );
     }
     return user;
   }
@@ -95,7 +131,17 @@ export class UsersService {
     phoneNumber: string,
     newPassword: string,
   ): Promise<void> {
-    const user = await this.getUserByPhone(phoneNumber);
+    const user = await this.usersRepository.findOneByField(
+      'phoneNumber',
+      phoneNumber,
+    );
+    if (!user) {
+      throw new AppError(
+        HttpStatus.BAD_REQUEST,
+        'Người dùng không tồn tại',
+        'USER_NOT_FOUND',
+      );
+    }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     user.password = hashedPassword;
@@ -117,9 +163,15 @@ export class UsersService {
   }
 
   async findById(id: string): Promise<User | null> {
-    const user = await this.usersRepository.findOneById(id);
+    try {
+      console.log(`Đang tìm kiếm thông tin người dùng ${id}...`);
+      const user = await this.usersRepository.findOneById(id);
 
-    return user;
+      return user;
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
   }
 
   private getRefreshTokenFromCookie(cookieStr) {

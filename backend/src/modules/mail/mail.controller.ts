@@ -11,7 +11,7 @@ export class MailController {
   async sendOtp(@Body() sendOtpDto: SendOtpDto) {
     try {
       // Gọi service gửi email OTP
-      await this.mailService.sendOtp(sendOtpDto);
+      await this.mailService.sendOtpQueue(sendOtpDto);
       return { message: 'OTP đã được gửi thành công!' };
     } catch (error) {
       return { message: 'Có lỗi xảy ra khi gửi OTP', error: error.message };

@@ -6,6 +6,11 @@ import { GlobalResponseInterceptor } from '@core/interceptors/response.intercept
 import { GlobalExceptionFilter } from '@core/exceptions/globalException.filter';
 import * as cookieParser from 'cookie-parser';
 import { MAIN_PORT } from '@environments';
+import { createBullBoard } from '@bull-board/api';
+import { BullAdapter } from '@bull-board/api/bullAdapter';
+import { ExpressAdapter } from '@bull-board/express';
+import { getQueueToken } from '@nestjs/bull';
+import { Queue } from 'bull';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -30,6 +35,18 @@ async function bootstrap() {
 
   app.useGlobalInterceptors(new GlobalResponseInterceptor());
   app.useGlobalFilters(new GlobalExceptionFilter())
+
+  const emailQueue = app.get<Queue>(getQueueToken('email'));
+
+  const serverAdapter = new ExpressAdapter();
+  serverAdapter.setBasePath('/admin/queues');
+
+  createBullBoard({
+    queues: [new BullAdapter(emailQueue)],
+    serverAdapter,
+  });
+
+  app.use('/admin/queues', serverAdapter.getRouter());
 
   const PORT = MAIN_PORT;
   await app.listen(PORT);
