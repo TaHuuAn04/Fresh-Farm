@@ -1,6 +1,4 @@
-import { Device } from 'database/entities/device.entity';
-import { CreateDeviceDto } from '../dtos/createDevice.dto';
-import { UpdateDeviceDto } from '../dtos/updateDevice.dto';
+import { Device } from '@entities';
 
 export interface IDeviceRepository {
   create(data: Partial<Device>): Device;

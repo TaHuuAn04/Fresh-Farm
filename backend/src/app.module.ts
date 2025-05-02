@@ -1,10 +1,9 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { DatabaseModule } from 'database/database.module';
 import { DevicesModule } from '@modules/devices/devices.module';
 import { AdafruitModule } from './modules/adafruit/adafruit.module';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule, ConfigService, ConfigType } from '@nestjs/config';
 import { WinstonModule } from 'nest-winston';
 import { CONFIG_KEY } from './config/config-key';
 import loggerConfig from './config/logger/log.config';
@@ -12,6 +11,19 @@ import { AuthModule } from '@modules/auth/auth.module';
 import { MailModule } from '@modules/mail/mail.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { BullModule } from '@nestjs/bull';
+import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { configurations, DatabaseConfig } from '@config';
+import { addTransactionalDataSource } from 'typeorm-transactional';
+import { DataSource } from 'typeorm';
+import { ChatBotModule } from '@modules/chat-bot/chat-bot.module';
+
+const modules = [
+  DevicesModule,
+  AdafruitModule,
+  AuthModule,
+  MailModule,
+  ChatBotModule,
+];
 
 @Module({
   imports: [
@@ -42,11 +54,40 @@ import { BullModule } from '@nestjs/bull';
     BullModule.registerQueue({
       name: 'email',
     }),
-    DatabaseModule,
-    DevicesModule,
-    AdafruitModule,
-    AuthModule,
-    MailModule,
+    BullModule.forRoot({
+      redis: {
+        host: 'localhost',
+        port: 6379,
+      },
+    }),
+    BullModule.registerQueue({
+      name: 'email',
+    }),
+    TypeOrmModule.forRootAsync({
+      inject: [DatabaseConfig.KEY],
+      useFactory: (config: ConfigType<typeof DatabaseConfig>) => {
+        if (!config) {
+          throw new Error('Cannot start app without ORM config');
+        }
+        return config as TypeOrmModuleOptions;
+      },
+
+      // eslint-disable-next-line @typescript-eslint/require-await
+      async dataSourceFactory(options) {
+        if (!options) {
+          throw new Error('Invalid options passed');
+        }
+
+        return addTransactionalDataSource(new DataSource(options));
+      },
+    }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+      load: configurations,
+    }),
+
+    ...modules,
   ],
   controllers: [AppController],
   providers: [AppService],

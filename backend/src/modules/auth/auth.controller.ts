@@ -68,6 +68,7 @@ export class AuthController {
     await this.usersService.setCurrentRefreshToken(refreshTokenCookie, user.id);
 
     response.setHeader('Set-Cookie', [accessTokenCookie, refreshTokenCookie]);
+    
     user.password = undefined;
 
     const res = {
