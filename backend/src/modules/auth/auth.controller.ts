@@ -68,8 +68,8 @@ export class AuthController {
     await this.usersService.setCurrentRefreshToken(refreshTokenCookie, user.id);
 
     response.setHeader('Set-Cookie', [accessTokenCookie, refreshTokenCookie]);
-    
-    user.password = undefined;
+
+    user.password = '';
 
     const res = {
       statusCode: 200,

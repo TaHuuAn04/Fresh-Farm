@@ -47,7 +47,6 @@ export class AuthService {
           'PHONE_EXIST',
         );
       }
-<<<<<<< HEAD
       
       const userWithEmail = await this.usersService.getUserByEmail(dto.email);
       if (userWithEmail) {
@@ -57,8 +56,6 @@ export class AuthService {
           'EMAIL_EXIST',
         );
       }
-=======
->>>>>>> 5dd9f8e3 (feat/add-blocking-chat)
 
       await this.usersService.createUser(dto);
 
@@ -135,10 +132,6 @@ export class AuthService {
 
 
       return { message: 'Mã OTP mới đã được gửi.' };
-    } catch (error) {
-      const statusCode = error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR;
-      const messgae = error.message || 'Xảy ra lỗi trong quá trình gửi OTP';
-      throw new AppError(statusCode, messgae, 'SEND_OTP_ERROR');
     }
   }
 
@@ -161,11 +154,6 @@ export class AuthService {
 
 
       return { message: 'Mã OTP đã được gửi đến số điện thoại của bạn.' };
-    } catch (error) {
-      const statusCode = error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR;
-      const messgae = error.message || 'Xảy ra lỗi trong quá trình gửi OTP';
-      
-      throw new AppError(statusCode, messgae, 'SEND_OTP_ERROR');
     }
   }
 

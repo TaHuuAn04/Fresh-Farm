@@ -15,7 +15,7 @@ import { initializeTransactionalContext } from 'typeorm-transactional';
 
 async function bootstrap() {
   // Initialize transactional context
-  await initializeTransactionalContext();
+  initializeTransactionalContext();
 
   const app = await NestFactory.create(AppModule);
   app.use(cookieParser());
@@ -39,18 +39,6 @@ async function bootstrap() {
 
   app.useGlobalInterceptors(new GlobalResponseInterceptor());
   app.useGlobalFilters(new GlobalExceptionFilter());
-
-  const emailQueue = app.get<Queue>(getQueueToken('email'));
-
-  const serverAdapter = new ExpressAdapter();
-  serverAdapter.setBasePath('/admin/queues');
-
-  createBullBoard({
-    queues: [new BullAdapter(emailQueue)],
-    serverAdapter,
-  });
-
-  app.use('/admin/queues', serverAdapter.getRouter());
 
   const emailQueue = app.get<Queue>(getQueueToken('email'));
 

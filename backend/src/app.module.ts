@@ -24,10 +24,6 @@ const modules = [
   MailModule,
   ChatBotModule,
 ];
-<<<<<<< HEAD
-
-=======
->>>>>>> 5dd9f8e3 (feat/add-blocking-chat)
 @Module({
   imports: [
     ConfigModule.forRoot({
