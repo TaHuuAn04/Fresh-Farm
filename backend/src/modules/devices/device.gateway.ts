@@ -20,9 +20,7 @@ export class DeviceGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private deviceToUserCache: Map<string, string> = new Map();
   private client: mqtt.MqttClient;
 
-  constructor(
-    private readonly deviceService: DevicesService,
-  ) {
+  constructor(private readonly deviceService: DevicesService) {
     this.setupMqttClient();
   }
 
@@ -56,14 +54,14 @@ export class DeviceGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   async getUserIdByDeviceId(deviceId: string): Promise<string | null> {
     if (this.deviceToUserCache.has(deviceId)) {
-      console.log("cache")
-      return this.deviceToUserCache.get(deviceId)!; 
+      console.log('cache');
+      return this.deviceToUserCache.get(deviceId)!;
     }
 
     const userId = await this.deviceService.findUserIdByDeviceId(deviceId);
 
     if (userId) {
-      this.deviceToUserCache.set(deviceId, userId); 
+      this.deviceToUserCache.set(deviceId, userId);
     }
 
     return userId;
@@ -72,7 +70,7 @@ export class DeviceGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @UseGuards(JwtAuthGuard)
   handleConnection(client: Socket) {
     const userId = client.handshake.query.userId as string;
-    console.log(userId)
+    console.log(userId);
     if (userId) {
       this.users.set(userId, client);
       console.log(`✅ User connected: ${userId}`);
@@ -106,4 +104,3 @@ export class DeviceGateway implements OnGatewayConnection, OnGatewayDisconnect {
     return parts[2] || 'unknown-device';
   }
 }
-

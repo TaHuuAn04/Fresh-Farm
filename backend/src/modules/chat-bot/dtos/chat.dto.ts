@@ -1,10 +1,11 @@
-import { HttpMethod } from '@common/enums';
+import { ChatType, HttpMethod } from '@common/enums';
 import { User } from '@entities';
 import { BASE_URL_AI } from '@environments';
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose, Type } from 'class-transformer';
 import {
   IsArray,
+  IsEnum,
   IsNotEmpty,
   IsObject,
   IsOptional,
@@ -100,6 +101,10 @@ export class ChatMessageDifyAiInputDataDto {
   @IsString()
   @IsOptional()
   listDevices: string;
+
+  @IsEnum(ChatType)
+  @IsOptional()
+  type: ChatType;
 }
 
 export enum EventType {
