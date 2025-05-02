@@ -31,3 +31,8 @@ export const JWT_REFRESH_TOKEN_EXPIRATION_TIME =
 
 export const MAIL_USER = process.env.MAIL_USER || 'email';
 export const MAIL_PASS = process.env.MAIL_PASS || 'password';
+
+// Chatbot
+export const X_APP_CODE = process.env.X_APP_CODE || 'x-app-code';
+export const BASE_URL_AI = process.env.BASE_URL_AI || 'http://localhost:5001';
+export const NIMSPACE_AI_ID = process.env.NIMSPACE_AI_ID || '';

@@ -3,10 +3,8 @@ import {
   HttpStatus,
   Inject,
   Injectable,
-  Logger,
   NotFoundException,
 } from '@nestjs/common';
-import * as crypto from 'crypto';
 import { AppError } from '@common/dtos/errorResponse.dto';
 import { USERS_REPOSITORY } from '@common/constants';
 import { IUsersRepository } from './repositories/users.repository.interface';

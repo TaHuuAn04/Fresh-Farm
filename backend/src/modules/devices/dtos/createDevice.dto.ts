@@ -1,5 +1,11 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 import { DeviceStatus } from '@common/enums';
 
 export class CreateDeviceDto {
@@ -9,7 +15,10 @@ export class CreateDeviceDto {
   @MaxLength(50)
   name: string;
 
-  @ApiPropertyOptional({ description: 'Trạng thái thiết bị', enum: DeviceStatus })
+  @ApiPropertyOptional({
+    description: 'Trạng thái thiết bị',
+    enum: DeviceStatus,
+  })
   @IsEnum(DeviceStatus)
   @IsOptional()
   status?: DeviceStatus;

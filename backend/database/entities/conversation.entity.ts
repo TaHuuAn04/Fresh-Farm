@@ -5,7 +5,7 @@ import { BaseEntity } from './base.entity';
 import { User } from './user.entity';
 
 @Entity()
-export class ChatConversation extends BaseEntity {
+export class Conversation extends BaseEntity {
   @Column({ type: 'varchar', length: 255 })
   conversationId: string;
 

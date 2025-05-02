@@ -47,14 +47,6 @@ export class AuthService {
           'PHONE_EXIST',
         );
       }
-      const userWithEmail = await this.usersService.getUserByEmail(dto.email);
-      if (userWithEmail) {
-        throw new AppError(
-          HttpStatus.BAD_REQUEST,
-          'Địa chỉ email đã được đăng ký',
-          'EMAIL_EXIST',
-        );
-      }
 
       await this.usersService.createUser(dto);
 

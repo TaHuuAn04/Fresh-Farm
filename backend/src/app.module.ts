@@ -15,6 +15,15 @@ import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { configurations, DatabaseConfig } from '@config';
 import { addTransactionalDataSource } from 'typeorm-transactional';
 import { DataSource } from 'typeorm';
+import { ChatBotModule } from '@modules/chat-bot/chat-bot.module';
+
+const modules = [
+  DevicesModule,
+  AdafruitModule,
+  AuthModule,
+  MailModule,
+  ChatBotModule,
+];
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -67,10 +76,8 @@ import { DataSource } from 'typeorm';
       envFilePath: '.env',
       load: configurations,
     }),
-    DevicesModule,
-    AdafruitModule,
-    AuthModule,
-    MailModule,
+
+    ...modules,
   ],
   controllers: [AppController],
   providers: [AppService],

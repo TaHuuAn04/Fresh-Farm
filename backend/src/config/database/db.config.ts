@@ -18,7 +18,7 @@ export default registerAs<TypeOrmModuleOptions>(CONFIG_KEY.DATABASE, () => ({
   username: DB_USER,
   password: DB_PASS,
   database: DB_NAME_DEVELOPMENT,
-  logging: true,
+  logging: false,
   autoLoadEntities: true,
   keepConnectionAlive: true,
   entities: [join(__dirname, '../../**/*.entity{.ts,.js}')],
