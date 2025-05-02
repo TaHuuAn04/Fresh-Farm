@@ -52,6 +52,18 @@ async function bootstrap() {
 
   app.use('/admin/queues', serverAdapter.getRouter());
 
+  const emailQueue = app.get<Queue>(getQueueToken('email'));
+
+  const serverAdapter = new ExpressAdapter();
+  serverAdapter.setBasePath('/admin/queues');
+
+  createBullBoard({
+    queues: [new BullAdapter(emailQueue)],
+    serverAdapter,
+  });
+
+  app.use('/admin/queues', serverAdapter.getRouter());
+
   const PORT = MAIN_PORT;
   await app.listen(PORT);
   console.log(`🚀 Server is running on: http://localhost:${PORT}`);

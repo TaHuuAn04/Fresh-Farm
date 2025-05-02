@@ -24,6 +24,7 @@ const modules = [
   MailModule,
   ChatBotModule,
 ];
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -43,6 +44,15 @@ const modules = [
       // port: 6379,
       isGlobal: true,
       ttl: 600 * 1000,
+    }),
+    BullModule.forRoot({
+      redis: {
+        host: 'localhost',
+        port: 6379,
+      },
+    }),
+    BullModule.registerQueue({
+      name: 'email',
     }),
     BullModule.forRoot({
       redis: {
