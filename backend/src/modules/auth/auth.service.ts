@@ -47,6 +47,7 @@ export class AuthService {
           'PHONE_EXIST',
         );
       }
+<<<<<<< HEAD
       
       const userWithEmail = await this.usersService.getUserByEmail(dto.email);
       if (userWithEmail) {
@@ -56,6 +57,8 @@ export class AuthService {
           'EMAIL_EXIST',
         );
       }
+=======
+>>>>>>> 5dd9f8e3 (feat/add-blocking-chat)
 
       await this.usersService.createUser(dto);
 
