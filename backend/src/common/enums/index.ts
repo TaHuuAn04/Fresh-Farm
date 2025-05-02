@@ -37,3 +37,8 @@ export enum EventType {
   MESSAGE_DELIVERED = 'message_delivered',
   MESSAGE_READ = 'message_read',
 }
+
+export enum ChatType {
+  BLOCKING = 'blocking',
+  STREAMING = 'streaming',
+}

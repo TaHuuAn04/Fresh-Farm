@@ -1,3 +1,4 @@
+import { Readable } from 'stream';
 import {
   ChatAiResponseDto,
   ChatMessageDifyAiInputDataDto,
@@ -22,8 +23,14 @@ export interface IChatBotService {
    * @param input
    * @returns
    */
-  chatAI(input: ChatMessageDifyAiInputDataDto): Promise<ChatAiResponseDto>;
+  chatAIBlocking(
+    input: ChatMessageDifyAiInputDataDto,
+  ): Promise<ChatAiResponseDto>;
 
+  /**
+   * Chat ai by calling API dify ai
+   * @param input
+   * @returns
   /**
    * Chat message blocking, chat message with blocking mode
    * @param userId
@@ -34,4 +41,25 @@ export interface IChatBotService {
     query: string,
     userId: string,
   ): Promise<ChatAiResponseDto>;
+
+  /**
+   * Chat message streaming, chat message with streaming mode
+   * @param userId
+   * @param query
+   * @returns
+   */
+  chatMessageStreaming(query: string, userId: string): Promise<Readable>;
+
+  /**
+   * Store conversation
+   * @param conversationId
+   * @param messageId
+   * @param userId
+   * @returns
+   */
+  storeConversation(
+    conversationId: string,
+    messageId: string,
+    userId: string,
+  ): Promise<void>;
 }
