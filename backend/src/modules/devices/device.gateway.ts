@@ -88,16 +88,13 @@ export class DeviceGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private setupMqttClient() {
     console.log('🧪 Đang khởi tạo MQTT client...');
     this.mqttClient = mqtt.connect('mqtts://io.adafruit.com', {
-      // username: ADAFRUIT_USERNAME,
-      // password: ADAFRUIT_KEY,
-      username: 'Cloudy1904',
-      password: 'aio_faHz60JTlsW0KSUPzas1UKBtfcTs',
+      username: ADAFRUIT_USERNAME,
+      password: ADAFRUIT_KEY,
     });
 
     this.mqttClient.on('connect', () => {
       console.log('📡 MQTT connected');
-      this.mqttClient.subscribe(`Cloudy1904/feeds/#`, (err) => {
-        // this.mqttClient.subscribe(`${ADAFRUIT_USERNAME}/feeds/#`, (err) => {
+      this.mqttClient.subscribe(`${ADAFRUIT_USERNAME}/feeds/#`, (err) => {
         if (err) {
           console.error('❌ MQTT subscription failed:', err.message);
         } else {
