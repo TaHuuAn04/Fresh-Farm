@@ -33,7 +33,7 @@ export class Device extends BaseEntity {
   @Column({
     type: 'enum',
     enum: DeviceType,
-    default: DeviceType.SENSOR,
+    default: DeviceType.OTHERS,
   })
   type: DeviceType;
 }

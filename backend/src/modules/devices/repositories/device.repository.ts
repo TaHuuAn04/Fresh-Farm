@@ -45,6 +45,6 @@ export class DeviceRepository implements IDeviceRepository {
   }
 
   async findPump(): Promise<Device[] | null> {
-    return this.repo.findBy({ type: DeviceType.PUMP });
+    return this.repo.findBy({ type: DeviceType.ACTUATOR_PUMP });
   }
 }

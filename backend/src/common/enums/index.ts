@@ -56,4 +56,5 @@ export enum DeviceType {
   ACTUATOR_FAN = 'ACTUATOR_FAN',
   ACTUATOR_LIGHT = 'ACTUATOR_LIGHT',
   CAMERA = 'CAMERA',
+  OTHERS = 'OTHERS',
 }
