@@ -1,9 +1,4 @@
-import {
-  HttpStatus,
-  Inject,
-  Injectable,
-  Logger,
-} from '@nestjs/common';
+import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { Device } from 'database/entities/device.entity';
 import { CreateDeviceDto } from '@modules/devices/dtos/createDevice.dto';
 import { UpdateDeviceDto } from '@modules/devices/dtos/updateDevice.dto';
@@ -17,7 +12,7 @@ import { DEVICE_REPOSITORY } from '@common/constants';
 
 @Injectable()
 export class DevicesService {
-  private readonly logger = new Logger(DevicesService.name)
+  private readonly logger = new Logger(DevicesService.name);
 
   constructor(
     @Inject(DEVICE_REPOSITORY)
@@ -26,14 +21,15 @@ export class DevicesService {
   ) {}
 
   async create(createDeviceDto: CreateDeviceDto): Promise<Device> {
-    const key = crypto.randomBytes(16).toString('hex');
-
-    await this.adafruitService.createFeed(createDeviceDto.name, key, createDeviceDto.description || '');
+    await this.adafruitService.createFeed(
+      createDeviceDto.name,
+      createDeviceDto.key,
+      createDeviceDto.description || '',
+    );
     this.logger.log('Created feed on Adafruit');
 
     const newDevice = this.deviceRepository.create({
       ...createDeviceDto,
-      key,
       status: DeviceStatus.OFFLINE,
     });
 
@@ -57,7 +53,12 @@ export class DevicesService {
 
   async findOne(id: string): Promise<Device> {
     const device = await this.deviceRepository.findOneById(id);
-    if (!device) throw new AppError(HttpStatus.NOT_FOUND, 'Device not found', 'DEVICE_NOT_FOUND');
+    if (!device)
+      throw new AppError(
+        HttpStatus.NOT_FOUND,
+        'Device not found',
+        'DEVICE_NOT_FOUND',
+      );
 
     try {
       const feedData = await this.adafruitService.getFeed(device.key);
@@ -91,7 +92,12 @@ export class DevicesService {
 
   async remove(id: string): Promise<void> {
     const device = await this.deviceRepository.findOneById(id);
-    if (!device) throw new AppError(HttpStatus.NOT_FOUND, 'Device not found', 'DEVICE_NOT_FOUND');
+    if (!device)
+      throw new AppError(
+        HttpStatus.NOT_FOUND,
+        'Device not found',
+        'DEVICE_NOT_FOUND',
+      );
 
     await this.adafruitService.deleteFeed(device.key);
     this.logger.log('Deleted feed on Adafruit');
@@ -99,11 +105,17 @@ export class DevicesService {
     await this.deviceRepository.remove(device);
   }
 
-  async toggleStatus(id: string, toggleDeviceDto: ToggleDeviceDto): Promise<Device> {
+  async toggleStatus(
+    id: string,
+    toggleDeviceDto: ToggleDeviceDto,
+  ): Promise<Device> {
     const device = await this.findOne(id);
     const newStatus = toggleDeviceDto.status;
 
-    await this.adafruitService.toggleFeedStatus(device.key, newStatus === DeviceStatus.ONLINE ? '1' : '0');
+    await this.adafruitService.toggleFeedStatus(
+      device.key,
+      newStatus === DeviceStatus.ONLINE ? '1' : '0',
+    );
     this.logger.log('Updated device status on Adafruit:', newStatus);
 
     device.status = newStatus;

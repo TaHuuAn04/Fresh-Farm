@@ -47,15 +47,15 @@ export class AuthService {
           'PHONE_EXIST',
         );
       }
-      
-      const userWithEmail = await this.usersService.getUserByEmail(dto.email);
-      if (userWithEmail) {
-        throw new AppError(
-          HttpStatus.BAD_REQUEST,
-          'Địa chỉ email đã được đăng ký',
-          'EMAIL_EXIST',
-        );
-      }
+
+      // const userWithEmail = await this.usersService.getUserByEmail(dto.email);
+      // if (userWithEmail) {
+      //   throw new AppError(
+      //     HttpStatus.BAD_REQUEST,
+      //     'Địa chỉ email đã được đăng ký',
+      //     'EMAIL_EXIST',
+      //   );
+      // }
 
       await this.usersService.createUser(dto);
 
@@ -130,7 +130,6 @@ export class AuthService {
       const statusCode = error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR;
       const messgae = error.message || 'Xảy ra lỗi trong quá trình gửi OTP';
 
-
       return { message: 'Mã OTP mới đã được gửi.' };
     }
   }
@@ -151,7 +150,6 @@ export class AuthService {
     } catch (error) {
       const statusCode = error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR;
       const messgae = error.message || 'Xảy ra lỗi trong quá trình gửi OTP';
-
 
       return { message: 'Mã OTP đã được gửi đến số điện thoại của bạn.' };
     }

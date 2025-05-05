@@ -42,3 +42,9 @@ export enum ChatType {
   BLOCKING = 'blocking',
   STREAMING = 'streaming',
 }
+
+export enum Severity {
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high',
+}

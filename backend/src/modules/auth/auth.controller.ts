@@ -7,6 +7,7 @@ import {
   UseGuards,
   Req,
   Get,
+  HttpStatus,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dtos/register.dto';
@@ -21,8 +22,14 @@ import { Response } from 'express';
 import JwtAuth from './guard/jwtAuth.guard';
 import { UsersService } from '@modules/users/users.service';
 import JwtRefreshGuard from './guard/jwtAuthRefresh.guard';
+import { CurrentUser } from '@common/decorators/current-user.decorator';
+import { User } from '@entities';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { AppError } from '@common/dtos/errorResponse.dto';
 
+@ApiTags('Auth')
 @Controller('auth')
+@ApiBearerAuth('Authorization')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
@@ -118,15 +125,15 @@ export class AuthController {
 
   @UseGuards(JwtAuth)
   @Get('me')
-  async getMe(@Req() request: RequestWithUser, @Res() response: Response) {
-    const user = await this.authService.getMe(request.user.id);
-
-    const res = {
-      statusCode: 200,
-      message: 'Thành công',
-      data: user,
-    };
-
-    response.send(res);
+  async getMe(@CurrentUser() user: User): Promise<User> {
+    const getUser = await this.usersService.findById(user.id);
+    if (!getUser) {
+      throw new AppError(
+        HttpStatus.NOT_FOUND,
+        'User not found',
+        'USER_NOT_FOUND',
+      );
+    }
+    return getUser;
   }
 }

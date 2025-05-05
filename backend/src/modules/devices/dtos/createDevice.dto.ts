@@ -27,4 +27,9 @@ export class CreateDeviceDto {
   @IsString()
   @IsOptional()
   description?: string;
+
+  @ApiPropertyOptional({ description: 'Mã thiết bị' })
+  @IsString()
+  @IsNotEmpty()
+  key: string;
 }

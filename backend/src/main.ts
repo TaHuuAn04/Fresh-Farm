@@ -20,8 +20,17 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.use(cookieParser());
 
-  // Cấu hình CORS (Cross-Origin Resource Sharing)
-  app.enableCors();
+  // Cấu hình CORS
+  app.enableCors({
+    origin: [
+      'http://localhost:3001',
+      'http://localhost:3000',
+      'http://localhost:3010',
+    ],
+    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Accept', 'Authorization'],
+  });
 
   // Cấu hình Swagger
   const config = new DocumentBuilder()
@@ -41,7 +50,6 @@ async function bootstrap() {
   app.useGlobalFilters(new GlobalExceptionFilter());
 
   const emailQueue = app.get<Queue>(getQueueToken('email'));
-
   const serverAdapter = new ExpressAdapter();
   serverAdapter.setBasePath('/admin/queues');
 
