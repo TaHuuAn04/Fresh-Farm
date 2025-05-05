@@ -126,7 +126,7 @@ export class DeviceGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.sendDataToUser(userId, {
           deviceKey,
           data: {
-            ...JSON.parse(message.toString()),
+            ...parsed,
             type: device.type
           },
         });
