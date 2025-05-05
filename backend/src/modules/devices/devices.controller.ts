@@ -20,7 +20,7 @@ import RequestWithUser from '@modules/auth/interface/requestWithUser.interface';
 @ApiTags('Devices')
 @Controller('devices')
 export class DevicesController {
-  constructor(private readonly devicesService: DevicesService) {}
+  constructor(private readonly devicesService: DevicesService) { }
 
   @UseGuards(JwtAuthGuard)
   @Post()

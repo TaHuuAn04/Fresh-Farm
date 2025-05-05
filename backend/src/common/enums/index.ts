@@ -48,3 +48,12 @@ export enum Severity {
   MEDIUM = 'medium',
   HIGH = 'high',
 }
+
+export enum DeviceType {
+  SENSOR_HUMIDITY = 'SENSOR_HUMIDITY',
+  SENSOR_TEMPERATURE = 'SENSOR_TEMPERATURE',
+  ACTUATOR_PUMP = 'ACTUATOR_PUMP',
+  ACTUATOR_FAN = 'ACTUATOR_FAN',
+  ACTUATOR_LIGHT = 'ACTUATOR_LIGHT',
+  CAMERA = 'CAMERA',
+}

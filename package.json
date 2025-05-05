@@ -20,6 +20,7 @@
     "@nestjs/jwt": "^11.0.0",
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-socket.io": "^9.4.3",
+    "@nestjs/schedule": "^6.0.0",
     "@nestjs/websockets": "^11.1.0",
     "@novu/node": "^2.6.6",
     "@types/cookie-parser": "^1.4.8",

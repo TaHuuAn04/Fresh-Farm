@@ -29,7 +29,7 @@ export class UserRepository implements IUsersRepository {
   }
 
   async findOneByField(field: string, value: string): Promise<User | null> {
-    const fields = ['email', 'phoneNumber'];
+    const fields = ['email', 'phone_number'];
     if (!fields.includes(field)) {
       throw new AppError(
         HttpStatus.INTERNAL_SERVER_ERROR,

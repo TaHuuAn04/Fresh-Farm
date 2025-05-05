@@ -38,7 +38,7 @@ export class AuthService {
   async registerUser(dto: RegisterDto) {
     try {
       const userWithPhone = await this.usersService.getUserByPhone(
-        dto.phoneNumber,
+        dto.phone_number,
       );
       if (userWithPhone) {
         throw new AppError(
@@ -59,7 +59,7 @@ export class AuthService {
 
       await this.usersService.createUser(dto);
 
-      const otp = await this.otpService.createOtp(dto.phoneNumber);
+      const otp = await this.otpService.createOtp(dto.phone_number);
       const sendOtpDto: SendOtpDto = {
         email: dto.email,
         code: otp,
