@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import ReduxProvider from "@/redux/provider";
+import Spinner from "@/components/spinner";
+import Footer from "@/components/footer";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,11 +27,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased mx-auto min-h-screen w-full`}
       >
-        {children}
+        <ReduxProvider>
+          <div className="w-full flex flex-col">
+            {children}
+            {/* <Footer /> */}
+          </div>
+          <Spinner />
+          <Toaster />
+        </ReduxProvider>
       </body>
     </html>
   );
