@@ -96,7 +96,8 @@ const columns: ColumnDef<HistoryRecord>[] = [
       );
     },
     cell: ({ row }) => {
-      const timestamp = row.getValue("time") as Date;
+      // const timestamp = row.getValue("time") as Date;
+      const timestamp = new Date();
       return (
         <div className="whitespace-nowrap">
           {format(timestamp, "dd/MM/yyyy HH:mm")}

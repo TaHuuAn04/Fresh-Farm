@@ -9,7 +9,11 @@ import axiosInstance from "./axios-interceptor.api";
 
 export async function register(payload: RegisterType) {
   try {
-    const res = await axiosInstance.post(`/auth/register`, payload);
+    const { phoneNumber, ...data } = payload;
+    const res = await axiosInstance.post(`/auth/register`, {
+      ...data,
+      phone_number: phoneNumber,
+    });
     return res?.data;
   } catch (error) {
     console.log("Error when get all devices", error);
