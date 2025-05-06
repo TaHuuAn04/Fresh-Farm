@@ -144,7 +144,17 @@ export class DevicesService {
 
   async findDevicesByUserId(userId: string) {
     const devices = await this.deviceRepository.findDevicesByUserId(userId);
-    return devices;
+    
+    const devicesWithFeed = await Promise.all(devices?.map(async (device) => {
+      const feedOfDevice = await this.adafruitService.getFeed(device.key);
+      
+      return {
+        ...device,
+        value: feedOfDevice?.last_value
+      };
+    }) || []); // Ensure it's never undefined
+  
+    return devicesWithFeed;
   }
 
 
