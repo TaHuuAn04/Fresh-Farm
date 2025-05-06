@@ -8,10 +8,10 @@ import { User } from 'database/entities/user.entity';
 export class LocalStrategy extends PassportStrategy(Strategy) {
   constructor(private authService: AuthService) {
     super({
-      usernameField: 'phoneNumber',
+      usernameField: 'phone_number',
     });
   }
-  async validate(phoneNumber: string, password: string): Promise<User | null> {
-    return this.authService.getAuthenticatedUser(phoneNumber, password);
+  async validate(phone_number: string, password: string): Promise<User | null> {
+    return this.authService.getAuthenticatedUser(phone_number, password);
   }
 }

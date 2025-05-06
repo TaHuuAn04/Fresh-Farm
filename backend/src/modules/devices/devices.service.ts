@@ -3,12 +3,15 @@ import { Device } from 'database/entities/device.entity';
 import { CreateDeviceDto } from '@modules/devices/dtos/createDevice.dto';
 import { UpdateDeviceDto } from '@modules/devices/dtos/updateDevice.dto';
 import { ToggleDeviceDto } from '@modules/devices/dtos/toggleDevice.dto';
-import { DeviceStatus } from '@common/enums';
-import * as crypto from 'crypto';
+import { DeviceStatus, Severity } from '@common/enums';
+import { v4 as uuidv4 } from 'uuid';
 import { AppError } from '@common/dtos/errorResponse.dto';
 import { AdafruitService } from '@modules/adafruit/adafruit.service';
 import { IDeviceRepository } from './repositories/device.repository.interface';
 import { DEVICE_REPOSITORY } from '@common/constants';
+import { Cron } from '@nestjs/schedule';
+import { CreateNotificationDto } from '@modules/notification/dtos/createNotification.dto';
+import { NotificationService } from '@modules/notification/notification.service';
 
 @Injectable()
 export class DevicesService {
@@ -18,12 +21,15 @@ export class DevicesService {
     @Inject(DEVICE_REPOSITORY)
     private readonly deviceRepository: IDeviceRepository,
     private readonly adafruitService: AdafruitService,
-  ) {}
+    private readonly notiService: NotificationService
+  ) { }
 
-  async create(createDeviceDto: CreateDeviceDto): Promise<Device> {
+  async create(createDeviceDto: CreateDeviceDto, userId: string): Promise<Device> {
+    const deviceKey = uuidv4();
+
     await this.adafruitService.createFeed(
       createDeviceDto.name,
-      createDeviceDto.key,
+      deviceKey,
       createDeviceDto.description || '',
     );
     this.logger.log('Created feed on Adafruit');
@@ -31,6 +37,8 @@ export class DevicesService {
     const newDevice = this.deviceRepository.create({
       ...createDeviceDto,
       status: DeviceStatus.OFFLINE,
+      key: deviceKey,
+      ownerId: userId
     });
 
     return this.deviceRepository.save(newDevice);
@@ -66,6 +74,18 @@ export class DevicesService {
     } catch {
       device['last_value'] = null;
     }
+
+    return device;
+  }
+
+  async findOneByKey(key: string): Promise<Device> {
+    const device = await this.deviceRepository.findOneByKey(key);
+    if (!device)
+      throw new AppError(
+        HttpStatus.NOT_FOUND,
+        'Device not found',
+        'DEVICE_NOT_FOUND',
+      );
 
     return device;
   }
@@ -125,5 +145,24 @@ export class DevicesService {
   async findDevicesByUserId(userId: string) {
     const devices = await this.deviceRepository.findDevicesByUserId(userId);
     return devices;
+  }
+
+
+  @Cron('0 6 * * *') // Mỗi ngày lúc 6h sáng
+  async runPump() {
+    const devices = await this.deviceRepository.findPump();
+    if (!devices) return;
+
+    for (const device of devices) {
+      await this.adafruitService.toggleFeedStatus(device.key, '1');
+
+      const notification: CreateNotificationDto = {
+        content: `Thiết bị bơm ${device.name} đã được kích hoạt tự động lúc 6h sáng.`,
+        time: new Date(),
+        severity: Severity.MEDIUM
+      };
+
+      await this.notiService.create(notification, device.ownerId);
+    }
   }
 }

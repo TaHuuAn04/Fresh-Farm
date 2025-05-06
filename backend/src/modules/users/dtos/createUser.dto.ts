@@ -20,7 +20,7 @@ export class CreateUserDto {
 
   @IsString()
   @IsNotEmpty()
-  phoneNumber: string;
+  phone_number: string;
 
   @IsString()
   @IsNotEmpty()

@@ -13,7 +13,7 @@ export class User extends BaseEntity {
   age: number;
 
   @Column({ type: 'varchar', length: 10, unique: true })
-  phoneNumber: string;
+  phone_number: string;
 
   @Column({ type: 'varchar' })
   password: string;

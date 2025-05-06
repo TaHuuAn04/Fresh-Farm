@@ -13,9 +13,11 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { BullModule } from '@nestjs/bull';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { configurations, DatabaseConfig } from '@config';
-import { addTransactionalDataSource } from 'typeorm-transactional';
-import { DataSource } from 'typeorm';
+import { getDataSourceByName, addTransactionalDataSource } from 'typeorm-transactional';
+import { DataSource, DataSourceOptions } from 'typeorm';
 import { ChatBotModule } from '@modules/chat-bot/chat-bot.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { NotificationModule } from '@modules/notification/notification.module';
 
 const modules = [
   DevicesModule,
@@ -23,6 +25,7 @@ const modules = [
   AuthModule,
   MailModule,
   ChatBotModule,
+  NotificationModule
 ];
 @Module({
   imports: [
@@ -72,23 +75,38 @@ const modules = [
       },
 
       // eslint-disable-next-line @typescript-eslint/require-await
-      async dataSourceFactory(options) {
+      // async dataSourceFactory(options) {
+      //   if (!options) {
+      //     throw new Error('Invalid options passed');
+      //   }
+
+      //   return addTransactionalDataSource(new DataSource(options));
+      // },
+      async dataSourceFactory(options?: DataSourceOptions): Promise<DataSource> {
         if (!options) {
           throw new Error('Invalid options passed');
         }
 
-        return addTransactionalDataSource(new DataSource(options));
-      },
+        const dataSource = new DataSource(options);
+
+        try {
+          getDataSourceByName('default');
+        } catch {
+          addTransactionalDataSource(dataSource);
+        }
+
+        return dataSource;
+      }
     }),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
       load: configurations,
     }),
-
+    ScheduleModule.forRoot(),
     ...modules,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

@@ -20,15 +20,15 @@ import RequestWithUser from '@modules/auth/interface/requestWithUser.interface';
 @ApiTags('Devices')
 @Controller('devices')
 export class DevicesController {
-  constructor(private readonly devicesService: DevicesService) {}
+  constructor(private readonly devicesService: DevicesService) { }
 
   @UseGuards(JwtAuthGuard)
   @Post()
   @ApiOperation({ summary: 'Tạo một thiết bị mới' })
   @ApiResponse({ status: 201, description: 'Thiết bị được tạo thành công' })
   @ApiResponse({ status: 400, description: 'Dữ liệu không hợp lệ' })
-  async create(@Body() createDeviceDto: CreateDeviceDto) {
-    return this.devicesService.create(createDeviceDto);
+  async create(@Req() request: RequestWithUser, @Body() createDeviceDto: CreateDeviceDto) {
+    return this.devicesService.create(createDeviceDto, request.user.id);
   }
 
   @UseGuards(JwtAuthGuard)

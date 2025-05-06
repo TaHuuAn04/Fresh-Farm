@@ -8,9 +8,11 @@ import { IDeviceRepository } from './repositories/device.repository.interface';
 import { DEVICE_REPOSITORY } from '@common/constants';
 import { DevicesController } from './devices.controller';
 import { DeviceGateway } from './device.gateway';
+import { UsersModule } from '@modules/users/users.module';
+import { NotificationModule } from '@modules/notification/notification.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Device])],
+  imports: [TypeOrmModule.forFeature([Device]), UsersModule, NotificationModule],
   providers: [
     DeviceGateway,
     DevicesService,
@@ -23,4 +25,4 @@ import { DeviceGateway } from './device.gateway';
   controllers: [DevicesController],
   exports: [DevicesService],
 })
-export class DevicesModule {}
+export class DevicesModule { }

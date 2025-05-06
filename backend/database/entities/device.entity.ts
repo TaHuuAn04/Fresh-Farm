@@ -1,4 +1,4 @@
-import { DeviceStatus } from '@common/enums';
+import { DeviceStatus, DeviceType } from '@common/enums';
 import { Entity, Column, ManyToOne } from 'typeorm';
 import { User } from './user.entity';
 import { BaseEntity } from './base.entity';
@@ -29,4 +29,11 @@ export class Device extends BaseEntity {
 
   @Column({ type: 'uuid', nullable: true })
   ownerId: string;
+
+  @Column({
+    type: 'enum',
+    enum: DeviceType,
+    default: DeviceType.OTHERS,
+  })
+  type: DeviceType;
 }

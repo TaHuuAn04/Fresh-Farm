@@ -19,7 +19,7 @@ export class UsersService {
   constructor(
     @Inject(USERS_REPOSITORY)
     private readonly usersRepository: IUsersRepository,
-  ) {}
+  ) { }
 
   async createUser(dto: CreateUserDto): Promise<User> {
     const hashedPassword = await bcrypt.hash(dto.password, 10);
@@ -34,7 +34,7 @@ export class UsersService {
 
   async verifyUserByPhone(phoneNumber: string): Promise<void> {
     const user = await this.usersRepository.findOneByField(
-      'phoneNumber',
+      'phone_number',
       phoneNumber,
     );
     if (!user) {
@@ -50,7 +50,7 @@ export class UsersService {
 
   async blockUserByPhone(phoneNumber: string): Promise<void> {
     const user = await this.usersRepository.findOneByField(
-      'phoneNumber',
+      'phone_number',
       phoneNumber,
     );
     if (!user) {
@@ -68,7 +68,7 @@ export class UsersService {
 
   async getUserForOtpResend(phoneNumber: string): Promise<User> {
     const user = await this.usersRepository.findOneByField(
-      'phoneNumber',
+      'phone_number',
       phoneNumber,
     );
     if (!user) {
@@ -108,7 +108,7 @@ export class UsersService {
 
   async getUserByPhone(phoneNumber: string): Promise<User | null> {
     const user = await this.usersRepository.findOneByField(
-      'phoneNumber',
+      'phone_number',
       phoneNumber,
     );
 
@@ -132,7 +132,7 @@ export class UsersService {
     newPassword: string,
   ): Promise<void> {
     const user = await this.usersRepository.findOneByField(
-      'phoneNumber',
+      'phone_number',
       phoneNumber,
     );
     if (!user) {

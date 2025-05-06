@@ -3,13 +3,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Device } from 'database/entities/device.entity';
 import { IDeviceRepository } from './device.repository.interface';
+import { DeviceType } from '@common/enums';
 
 @Injectable()
 export class DeviceRepository implements IDeviceRepository {
   constructor(
     @InjectRepository(Device)
     private readonly repo: Repository<Device>,
-  ) {}
+  ) { }
 
   create(data: Partial<Device>): Device {
     return this.repo.create(data);
@@ -41,5 +42,9 @@ export class DeviceRepository implements IDeviceRepository {
         ownerId: userId,
       },
     });
+  }
+
+  async findPump(): Promise<Device[] | null> {
+    return this.repo.findBy({ type: DeviceType.ACTUATOR_PUMP });
   }
 }
