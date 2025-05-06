@@ -6,7 +6,7 @@ import {
   IsString,
   MaxLength,
 } from 'class-validator';
-import { DeviceStatus } from '@common/enums';
+import { DeviceStatus, DeviceType } from '@common/enums';
 
 export class CreateDeviceDto {
   @ApiProperty({ description: 'Tên thiết bị', maxLength: 50 })
@@ -28,8 +28,16 @@ export class CreateDeviceDto {
   @IsOptional()
   description?: string;
 
-  @ApiPropertyOptional({ description: 'Mã thiết bị' })
-  @IsString()
-  @IsNotEmpty()
-  key: string;
+  // @ApiPropertyOptional({ description: 'Mã thiết bị' })
+  // @IsString()
+  // @IsNotEmpty()
+  // key: string;
+
+  @ApiPropertyOptional({
+    description: 'Loại thiết bị',
+    enum: DeviceType,
+  })
+  @IsEnum(DeviceType)
+  @IsOptional()
+  type?: DeviceType;
 }

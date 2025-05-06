@@ -4,7 +4,7 @@ import { CreateDeviceDto } from '@modules/devices/dtos/createDevice.dto';
 import { UpdateDeviceDto } from '@modules/devices/dtos/updateDevice.dto';
 import { ToggleDeviceDto } from '@modules/devices/dtos/toggleDevice.dto';
 import { DeviceStatus, Severity } from '@common/enums';
-import * as crypto from 'crypto';
+import { v4 as uuidv4 } from 'uuid';
 import { AppError } from '@common/dtos/errorResponse.dto';
 import { AdafruitService } from '@modules/adafruit/adafruit.service';
 import { IDeviceRepository } from './repositories/device.repository.interface';
@@ -24,10 +24,12 @@ export class DevicesService {
     private readonly notiService: NotificationService
   ) { }
 
-  async create(createDeviceDto: CreateDeviceDto): Promise<Device> {
+  async create(createDeviceDto: CreateDeviceDto, userId: string): Promise<Device> {
+    const deviceKey = uuidv4();
+
     await this.adafruitService.createFeed(
       createDeviceDto.name,
-      createDeviceDto.key,
+      deviceKey,
       createDeviceDto.description || '',
     );
     this.logger.log('Created feed on Adafruit');
@@ -35,6 +37,8 @@ export class DevicesService {
     const newDevice = this.deviceRepository.create({
       ...createDeviceDto,
       status: DeviceStatus.OFFLINE,
+      key: deviceKey,
+      ownerId: userId
     });
 
     return this.deviceRepository.save(newDevice);

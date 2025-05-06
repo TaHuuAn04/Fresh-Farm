@@ -33,15 +33,18 @@ export class DeviceGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const userId = client.handshake.query.userId as string;
 
     if (!userId || !isUuid(userId)) {
+      console.log("ID người dùng không hợp lệ")
       return this.emitAndDisconnect(client, 'INVALID_USER_ID', 'ID người dùng không hợp lệ');
     }
 
     const user = await this.usersService.findById(userId);
     if (!user) {
+      console.log("Không tìm thấy người dùng")
       return this.emitAndDisconnect(client, 'USER_NOT_FOUND', 'Không tìm thấy người dùng');
     }
 
     this.users.set(userId, client);
+
     client.emit('system-message', {
       type: 'success',
       message: 'Kết nối thành công',
@@ -86,6 +89,7 @@ export class DeviceGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   private setupMqttClient() {
+    console.log(ADAFRUIT_USERNAME)
     console.log('🧪 Đang khởi tạo MQTT client...');
     this.mqttClient = mqtt.connect('mqtts://io.adafruit.com', {
       username: ADAFRUIT_USERNAME,
@@ -114,7 +118,7 @@ export class DeviceGateway implements OnGatewayConnection, OnGatewayDisconnect {
         return;
       }
 
-      if (!parsed?.key || !isUuid(parsed.key)) {
+      if (!isUuid(deviceKey)) {
         return;
       }
 
@@ -124,12 +128,17 @@ export class DeviceGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const device = await this.deviceService.findOneByKey(deviceKey);
 
         this.sendDataToUser(userId, {
-          deviceKey,
+          statusCode: 200,
+          message: 'Cập nhật giá trị mới thành công',
           data: {
-            ...parsed,
-            type: device.type
-          },
-        });
+            value: parsed?.data?.value,
+            type: device.type,
+            id: device.id,
+            deviceKey
+
+          }
+        }
+        );
       } else {
         console.warn(`⚠️ No user found for device ${deviceKey}`);
       }
