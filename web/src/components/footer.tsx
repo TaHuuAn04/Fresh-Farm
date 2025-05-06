@@ -1,5 +1,5 @@
-import Link from "next/link"
-import { Mail } from "lucide-react"
+import Link from "next/link";
+import { Mail } from "lucide-react";
 
 const Footer = () => {
   return (
@@ -26,13 +26,19 @@ const Footer = () => {
               <Link href="/home" className="text-gray-600 hover:text-gray-900">
                 Home
               </Link>
-              <Link href="/function" className="text-gray-600 hover:text-gray-900">
+              <Link
+                href="/function"
+                className="text-gray-600 hover:text-gray-900"
+              >
                 Function
               </Link>
-              <Link href="/chart" className="text-gray-600 hover:text-gray-900">
-                Chart
+              <Link href="/chat" className="text-gray-600 hover:text-gray-900">
+                Chat
               </Link>
-              <Link href="/history" className="text-gray-600 hover:text-gray-900">
+              <Link
+                href="/history"
+                className="text-gray-600 hover:text-gray-900"
+              >
                 History
               </Link>
             </nav>
@@ -42,16 +48,28 @@ const Footer = () => {
           <div className="flex flex-col space-y-4">
             <h3 className="text-lg font-semibold">Socials</h3>
             <nav className="flex flex-col space-y-2">
-              <Link href="https://facebook.com" className="text-gray-600 hover:text-gray-900">
+              <Link
+                href="https://facebook.com"
+                className="text-gray-600 hover:text-gray-900"
+              >
                 Facebook
               </Link>
-              <Link href="https://linkedin.com" className="text-gray-600 hover:text-gray-900">
+              <Link
+                href="https://linkedin.com"
+                className="text-gray-600 hover:text-gray-900"
+              >
                 Linkedin
               </Link>
-              <Link href="https://instagram.com" className="text-gray-600 hover:text-gray-900">
+              <Link
+                href="https://instagram.com"
+                className="text-gray-600 hover:text-gray-900"
+              >
                 Instagram
               </Link>
-              <Link href="https://twitter.com" className="text-gray-600 hover:text-gray-900">
+              <Link
+                href="https://twitter.com"
+                className="text-gray-600 hover:text-gray-900"
+              >
                 Twitter
               </Link>
             </nav>
@@ -62,11 +80,12 @@ const Footer = () => {
             <div className="space-y-2">
               <h3 className="text-lg font-semibold">Head Office</h3>
               <p className="text-gray-600">
-                Chandapura, SY No. 31/1, CIC Marha No. 11/4, Maluk, Electronic City Post, Bengaluru Urban- 7608000
+                BH-B6, Ho Chi Minh City University of Technology - VNU, Dong
+                Hoa, Di An, Binh Duong
               </p>
             </div>
 
-            <div className="space-y-2">
+            {/* <div className="space-y-2">
               <h3 className="text-lg font-semibold">News letter</h3>
               <div className="flex">
                 <input
@@ -78,7 +97,7 @@ const Footer = () => {
                   <Mail className="h-5 w-5 text-blue-500" />
                 </button>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
 
@@ -94,12 +113,13 @@ const Footer = () => {
               +84 12356789
             </a>
           </div>
-          <div className="text-gray-600 text-sm">© 2025 Fresh Farm All rights reserved.</div>
+          <div className="text-gray-600 text-sm">
+            © 2025 Fresh Farm All rights reserved.
+          </div>
         </div>
       </div>
     </footer>
-  )
-}
+  );
+};
 
-export default Footer
-
+export default Footer;
