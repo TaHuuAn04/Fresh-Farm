@@ -6,7 +6,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import { login, refresh, resendOTP } from "@/api/auth.api";
+import { login } from "@/api/auth.api";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
@@ -21,27 +21,23 @@ export default function LoginForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const response = await login({ phoneNumber, password });
+    const response = await login({ phone_number: phoneNumber, password });
 
     if (response?.status < 300) {
       toast.success("Success", {
         description: "Đăng nhập thành công",
       });
 
-      console.log(response);
-
       dispatch(
         changeState({
           fullName: response?.data?.fullName,
           role: response?.data?.role,
           age: response?.data?.age,
-          phoneNumber: response?.data?.phoneNumber,
+          phoneNumber: response?.data?.phone_number,
           email: response?.data?.email,
+          id: response?.data?.id,
         })
       );
-      setInterval(async () => {
-        await refresh();
-      }, 15 * 1000 * 60);
       router.push("/home");
     } else {
       toast.error("Failure", {

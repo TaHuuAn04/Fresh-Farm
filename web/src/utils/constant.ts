@@ -78,8 +78,14 @@ export interface ResetPasswordRequest {
   newPassword: string;
 }
 
+export interface BlockingMessageDto {
+  query: string;
+  accessToken: string;
+  refreshToken: string;
+}
+
 export interface LoginDto {
-  phoneNumber: string;
+  phone_number: string;
   password: string;
 }
 

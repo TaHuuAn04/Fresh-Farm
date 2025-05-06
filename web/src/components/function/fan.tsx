@@ -16,34 +16,14 @@ import { toast } from "sonner";
 import { useDispatch } from "react-redux";
 import { appearSpinner, disappearSpinner } from "@/redux/slices/spinnerSlice";
 
-export default function FanCard() {
+export default function FanCard({ id, deviceKey, value }) {
   const dispatch = useDispatch();
-  const [fanStatus, setFanStatus] = useState("offline");
   const [controlState, setControlState] = useState<boolean>(false);
-
-  useEffect(() => {
-    async function firstFetchFan() {
-      dispatch(appearSpinner());
-      const fan = await getDevice("c0d84e00-5352-40e8-8def-271baace6d8e");
-
-      if (fan?.statusCode && fan?.statusCode < 300) {
-        setFanStatus(fan?.data?.status);
-      } else {
-        toast.error("Failure", {
-          description: fan?.data?.message || "",
-        });
-      }
-      dispatch(disappearSpinner());
-    }
-    console.log(1);
-
-    firstFetchFan();
-  }, [controlState, dispatch]);
 
   async function toggleFan() {
     dispatch(appearSpinner());
-    const result = await toggleDevice("c0d84e00-5352-40e8-8def-271baace6d8e", {
-      status: fanStatus === "online" ? "offline" : "online",
+    const result = await toggleDevice(id, {
+      status: value > 0 ? "offline" : "online",
     }); // Gửi trạng thái mới
     if (result?.statusCode && result?.statusCode < 300)
       setControlState((prev) => !prev);
@@ -52,6 +32,8 @@ export default function FanCard() {
         description: result?.data?.message || "",
       });
     }
+
+    dispatch(disappearSpinner());
   }
 
   return (
@@ -60,11 +42,11 @@ export default function FanCard() {
         <CardTitle className="flex items-center gap-2">
           <Fan
             className={`h-5 w-5 ${
-              fanStatus === "online" ? "text-green-500" : "text-gray-500"
+              value > 0 ? "text-green-500" : "text-gray-500"
             }`}
           />
           <span>Fan Control</span>
-          {fanStatus === "online" && (
+          {value > 0 && (
             <Badge variant="outline" className="animate-pulse">
               Active
             </Badge>
@@ -76,14 +58,14 @@ export default function FanCard() {
         <div className="flex flex-col items-center mt-5">
           <div className="mb-6">
             <Button
-              variant={fanStatus === "online" ? "default" : "outline"}
+              variant={value > 0 ? "default" : "outline"}
               size="lg"
               onClick={toggleFan}
               className="h-16 w-16 rounded-full"
             >
               <Power
                 className={`h-8 w-8 ${
-                  fanStatus === "online" ? "text-white" : "text-gray-500"
+                  value > 0 ? "text-white" : "text-gray-500"
                 }`}
               />
             </Button>

@@ -1,4 +1,4 @@
-import axios from "axios";
+import axiosInstance from "./axios-interceptor.api";
 
 interface UpdateUserDto {
   fullName?: string;
@@ -10,7 +10,10 @@ interface UpdateUserDto {
 
 export async function updateUser(data: UpdateUserDto, id: string) {
   try {
-    const res = await axios.put(`/users/${id}`, data);
+    const res = await axiosInstance.put(`/users/${id}`, {
+      ...data,
+      phone_number: data?.phoneNumber ?? null,
+    });
     return res?.data;
   } catch (error) {
     console.log("Error when get all devices", error);

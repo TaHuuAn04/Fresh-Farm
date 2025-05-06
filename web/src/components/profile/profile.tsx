@@ -23,9 +23,10 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { updateUser } from "@/api/user.api";
+import { changeState } from "@/redux/slices/user.slice";
 
 const profileFormSchema = z.object({
   fullName: z
@@ -56,6 +57,7 @@ type ProfileFormValues = z.infer<typeof profileFormSchema>;
 export default function ProfileForm() {
   const [isLoading, setIsLoading] = useState(false);
   const user = useSelector((state: RootState) => state.user);
+  const dispatch = useDispatch();
 
   const defaultValues: ProfileFormValues = {
     fullName: user?.fullName || "John Doe",
@@ -74,11 +76,32 @@ export default function ProfileForm() {
     setIsLoading(true);
     try {
       // Call the updateUser API with the form data
-      // const response = await updateUser({
-      //   ...data,
-      //   age: Number(data.age), // Convert age back to number if API expects a number
-      // }, 'ádvádv');
+      const response = await updateUser(
+        {
+          ...data,
+          age: Number(data.age), // Convert age back to number if API expects a number
+        },
+        user?.id || ""
+      );
       console.log(data);
+
+      if (response?.statusCode && response.statusCode >= 300) {
+        toast.error("Error", {
+          description: "Failed to update profile. Please try again.",
+        });
+        return;
+      }
+
+      dispatch(
+        changeState({
+          fullName: response?.data?.fullName,
+          role: response?.data?.role,
+          age: response?.data?.age,
+          phoneNumber: response?.data?.phone_number,
+          email: response?.data?.email,
+          id: response?.data?.id,
+        })
+      );
 
       // Assuming updateUser returns a success response
       toast.success("Success", {

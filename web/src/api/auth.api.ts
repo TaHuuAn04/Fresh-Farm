@@ -98,3 +98,16 @@ export async function logout() {
     return error;
   }
 }
+
+export async function getUserInformation() {
+  try {
+    const res = await axiosInstance.get("/auth/me");
+    console.log(res);
+
+    return res;
+  } catch (error) {
+    console.log(error);
+
+    return error;
+  }
+}

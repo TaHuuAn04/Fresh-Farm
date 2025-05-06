@@ -12,8 +12,9 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useDispatch, useSelector } from "react-redux";
 import { appearSpinner, disappearSpinner } from "@/redux/slices/spinnerSlice";
-import { getAllDevices } from "@/api/devices";
+import { getAllDevices, getUserDevice } from "@/api/devices";
 import { RootState } from "@/redux/store";
+import { toast } from "sonner";
 
 interface Device {
   id: string;
@@ -37,8 +38,16 @@ export default function DeviceTable() {
   useEffect(() => {
     const firstFetch = async () => {
       dispatch(appearSpinner());
-      const result = await getAllDevices();
-      setDevices(result?.data);
+      const result = await getUserDevice();
+      console.log(result);
+
+      if (result?.status > 299) {
+        toast("Failure", {
+          description: "Fail to get user's devices",
+        });
+        return;
+      }
+      setDevices(result?.data?.data);
       dispatch(disappearSpinner());
     };
 
@@ -81,14 +90,21 @@ export default function DeviceTable() {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {devices &&
+        {!devices || devices.length === 0 ? (
+          <TableRow>
+            <TableCell colSpan={3} className="text-center">
+              No devices in your farm
+            </TableCell>
+          </TableRow>
+        ) : (
           devices.map((device, index) => (
             <TableRow key={device.id}>
               <TableCell className="font-medium">{index + 1}</TableCell>
               <TableCell>{device.name}</TableCell>
               <TableCell>{getStatusBadge(device.status)}</TableCell>
             </TableRow>
-          ))}
+          ))
+        )}
       </TableBody>
     </Table>
   );

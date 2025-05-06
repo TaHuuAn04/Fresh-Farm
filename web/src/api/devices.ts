@@ -3,7 +3,6 @@ import {
   ToggleDeviceDto,
   UpdateDeviceDto,
 } from "@/utils/constant";
-import axios from "axios";
 import axiosInstance from "./axios-interceptor.api";
 
 export async function getAllDevices() {
@@ -22,6 +21,18 @@ export async function getDevice(id: string) {
     // console.log("res", res);
 
     return res?.data;
+  } catch (error) {
+    console.log("Error when get specific device", error);
+    return error;
+  }
+}
+
+export async function getUserDevice() {
+  try {
+    const res = await axiosInstance.get(`/devices/me`);
+    // console.log("res", res);
+
+    return res;
   } catch (error) {
     console.log("Error when get specific device", error);
     return error;

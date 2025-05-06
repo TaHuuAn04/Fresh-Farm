@@ -6,6 +6,8 @@ interface InitialState {
   age: number;
   email: string;
   phoneNumber: string;
+  id: string;
+  isAuthenticated: boolean;
 }
 
 const initialState: InitialState = {
@@ -14,6 +16,8 @@ const initialState: InitialState = {
   age: 0,
   email: "",
   phoneNumber: "",
+  id: "",
+  isAuthenticated: false,
 };
 
 const userSlice = createSlice({
@@ -26,6 +30,8 @@ const userSlice = createSlice({
       state.age = action.payload.age;
       state.email = action.payload.email;
       state.phoneNumber = action.payload.phoneNumber;
+      state.isAuthenticated = action.payload.isAuthenticated;
+      state.id = action.payload.id;
     },
   },
 });

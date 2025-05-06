@@ -34,7 +34,7 @@ axiosInstance.interceptors.response.use(
 
           if (
             result?.status > 299 &&
-            window.location.href !== "http://localhost:3000"
+            window.location.href !== "http://localhost:3001"
           ) {
             window.location.href = "/";
           }
@@ -48,7 +48,7 @@ axiosInstance.interceptors.response.use(
           isRefreshing = false;
           refreshSubscribers = [];
 
-          if (window.location.href !== "http://localhost:3000") {
+          if (window.location.href !== "http://localhost:3001") {
             window.location.href = "/";
           }
           return Promise.reject(refreshError);
@@ -60,7 +60,6 @@ axiosInstance.interceptors.response.use(
             resolve(axiosInstance(originalRequest));
           });
         });
-        return Promise.reject(error);
       }
     }
 

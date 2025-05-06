@@ -13,9 +13,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Send } from "lucide-react";
+import { MessageCircleQuestion, Send } from "lucide-react";
 import { getDevice } from "@/api/devices";
 import { redirect } from "next/navigation";
+import { getBlockingMessages, getDetection } from "@/api/chat.api";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import { toast } from "sonner";
 
 type Message = {
   id: string;
@@ -25,6 +29,7 @@ type Message = {
 };
 
 export default function ChatPage() {
+  const user = useSelector((state: RootState) => state.user);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
@@ -34,6 +39,7 @@ export default function ChatPage() {
     },
   ]);
   const [inputValue, setInputValue] = useState("");
+  const [isWaiting, setIsWaiting] = useState(false);
 
   // Initial device check
   useEffect(() => {
@@ -47,10 +53,43 @@ export default function ChatPage() {
     checkDevice();
   }, []);
 
-  const handleSendMessage = () => {
+  const handleDetectFarm = async () => {
+    setIsWaiting(true);
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      content: "How is my farm now?",
+      sender: "user",
+      timestamp: new Date(),
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
+
+    const result = await getDetection();
+    // Simulate system response after a short delay
+
+    if (result?.statusCode > 299) {
+      toast("Error", {
+        description: "Something went wrong. Please try again.",
+      });
+      return;
+    }
+
+    const systemMessage: Message = {
+      id: (Date.now() + 1).toString(),
+      content: `${result?.data}`,
+      sender: "system",
+      timestamp: new Date(),
+    };
+
+    setMessages((prev) => [...prev, systemMessage]);
+    setIsWaiting(false);
+  };
+
+  const handleSendMessage = async () => {
     if (inputValue.trim() === "") return;
 
     // Add user message
+    setIsWaiting(true);
     const userMessage: Message = {
       id: Date.now().toString(),
       content: inputValue,
@@ -62,16 +101,28 @@ export default function ChatPage() {
     setInputValue("");
 
     // Simulate system response after a short delay
-    setTimeout(() => {
-      const systemMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        content: `I received your message: "${inputValue}"`,
-        sender: "system",
-        timestamp: new Date(),
-      };
+    const result = await getBlockingMessages({
+      query: inputValue,
+      accessToken: user?.accessToken,
+      refreshToken: user?.refreshToken,
+    });
 
-      setMessages((prev) => [...prev, systemMessage]);
-    }, 1000);
+    if (result?.statusCode > 299) {
+      toast("Error", {
+        description: "Something went wrong. Please try again.",
+      });
+      return;
+    }
+
+    const systemMessage: Message = {
+      id: (Date.now() + 1).toString(),
+      content: `${result?.data}`,
+      sender: "system",
+      timestamp: new Date(),
+    };
+
+    setMessages((prev) => [...prev, systemMessage]);
+    setIsWaiting(false);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -89,16 +140,21 @@ export default function ChatPage() {
     <div className="flex items-center justify-center min-h-screen p-4">
       <Card className="w-full max-w-3xl h-[80vh] flex flex-col">
         <CardHeader className="border-b">
-          <CardTitle className="flex items-center gap-2">
-            <Avatar className="h-8 w-8">
-              <AvatarImage
-                src="/placeholder.svg?height=32&width=32"
-                alt="System"
-              />
-              <AvatarFallback>SYS</AvatarFallback>
-            </Avatar>
-            <span>Chat System</span>
-          </CardTitle>
+          <div className="flex justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <Avatar className="h-8 w-8">
+                <AvatarImage
+                  src="/placeholder.svg?height=32&width=32"
+                  alt="System"
+                />
+                <AvatarFallback>SYS</AvatarFallback>
+              </Avatar>
+              <span>Chat System</span>
+            </CardTitle>
+            <Button onClick={handleDetectFarm} size="icon" disabled={isWaiting}>
+              <MessageCircleQuestion className="h-4 w-4" />
+            </Button>
+          </div>
         </CardHeader>
 
         <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -164,13 +220,14 @@ export default function ChatPage() {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyDown}
+              disabled={isWaiting}
               placeholder="Type your message..."
               className="flex-1"
             />
             <Button
               onClick={handleSendMessage}
               size="icon"
-              disabled={inputValue.trim() === ""}
+              disabled={inputValue.trim() === "" || isWaiting}
             >
               <Send className="h-4 w-4" />
             </Button>

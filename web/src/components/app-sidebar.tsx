@@ -26,7 +26,7 @@ export function AppSidebar() {
   return (
     <Sidebar>
       <SidebarHeader className="mx-auto pt-10">
-        <Link href={"/"} className="font-bold">
+        <Link href={"/home"} className="font-bold">
           <div className="text-[#d1d1d1] ">FRESH</div>
           <div className="flex text-[#d1d1d1] text-4xl">
             <p>F</p>

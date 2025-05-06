@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowUpDown } from "lucide-react";
 import { format } from "date-fns";
 
@@ -28,89 +28,19 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { getNotifications } from "@/api/notification.api";
+import { useDispatch } from "react-redux";
+import { toast } from "sonner";
+import { appearSpinner, disappearSpinner } from "@/redux/slices/spinnerSlice";
 
 // Define the data type for history records
 type HistoryRecord = {
   id: string;
   stt: number;
   content: string;
-  timestamp: Date;
+  time: Date;
   severity: "low" | "medium" | "high" | "critical";
 };
-
-// Sample data (unchanged)
-const data: HistoryRecord[] = [
-  {
-    id: "1",
-    stt: 1,
-    content: "System update completed",
-    timestamp: new Date("2025-04-25T14:30:00"),
-    severity: "low",
-  },
-  {
-    id: "2",
-    stt: 2,
-    content: "New user registered",
-    timestamp: new Date("2025-04-24T10:15:00"),
-    severity: "low",
-  },
-  {
-    id: "3",
-    stt: 3,
-    content: "Failed login attempt",
-    timestamp: new Date("2025-04-23T18:45:00"),
-    severity: "medium",
-  },
-  {
-    id: "4",
-    stt: 4,
-    content: "Database backup failed",
-    timestamp: new Date("2025-04-22T22:10:00"),
-    severity: "high",
-  },
-  {
-    id: "5",
-    stt: 5,
-    content: "Security breach detected",
-    timestamp: new Date("2025-04-21T03:25:00"),
-    severity: "critical",
-  },
-  {
-    id: "6",
-    stt: 6,
-    content: "Server maintenance completed",
-    timestamp: new Date("2025-04-20T09:00:00"),
-    severity: "low",
-  },
-  {
-    id: "7",
-    stt: 7,
-    content: "API rate limit exceeded",
-    timestamp: new Date("2025-04-19T16:30:00"),
-    severity: "medium",
-  },
-  {
-    id: "8",
-    stt: 8,
-    content: "Data synchronization error",
-    timestamp: new Date("2025-04-18T11:45:00"),
-    severity: "high",
-  },
-  {
-    id: "9",
-    stt: 9,
-    content: "New feature deployed",
-    timestamp: new Date("2025-04-17T14:20:00"),
-    severity: "low",
-  },
-  {
-    id: "10",
-    stt: 10,
-    content: "User permissions updated",
-    timestamp: new Date("2025-04-16T08:50:00"),
-    severity: "medium",
-  },
-];
 
 // Helper function to get severity badge
 const getSeverityBadge = (severity: HistoryRecord["severity"]) => {
@@ -166,7 +96,7 @@ const columns: ColumnDef<HistoryRecord>[] = [
       );
     },
     cell: ({ row }) => {
-      const timestamp = row.getValue("timestamp") as Date;
+      const timestamp = row.getValue("time") as Date;
       return (
         <div className="whitespace-nowrap">
           {format(timestamp, "dd/MM/yyyy HH:mm")}
@@ -199,10 +129,32 @@ const columns: ColumnDef<HistoryRecord>[] = [
 ];
 
 export function HistoryTable() {
+  const dispatch = useDispatch();
+  const [data, setData] = useState([]);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
+
+  useEffect(() => {
+    const firstFetch = async () => {
+      dispatch(appearSpinner());
+      const result = await getNotifications();
+
+      if (result?.status > 299) {
+        toast("Failure", {
+          description: "Fail to get notications",
+        });
+        return;
+      }
+
+      setData(result?.data?.data);
+
+      dispatch(disappearSpinner());
+    };
+
+    firstFetch();
+  }, []);
 
   const table = useReactTable({
     data,
