@@ -42,7 +42,7 @@ next-env.d.ts
 =======
 # compiled output
 /dist
-/node_modules
+/node_modules/
 /build
 
 # Logs
@@ -83,6 +83,8 @@ lerna-debug.log*
 .env.test.local
 .env.production.local
 .env.local
+venv311/*
+venv311
 
 # temp directory
 .temp
