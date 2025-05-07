@@ -3,6 +3,7 @@ import { AppError } from '@common/dtos/errorResponse.dto';
 import { ADAFRUIT_KEY, ADAFRUIT_USERNAME } from '@environments';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import axios from 'axios';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class AdafruitService {
@@ -22,7 +23,7 @@ export class AdafruitService {
     try {
       const response = await axios.post(
         `https://io.adafruit.com/api/v2/${this.adafruitUsername}/feeds`,
-        { name, key, description, last_value: 0 },
+        { name: uuidv4(), key, description, last_value: 0 },
         {
           headers: {
             'X-AIO-Key': this.adafruitKey,
