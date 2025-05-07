@@ -35,4 +35,6 @@ export const MAIL_PASS = process.env.MAIL_PASS || 'password';
 // Chatbot
 export const X_APP_CODE = process.env.X_APP_CODE || 'x-app-code';
 export const BASE_URL_AI = process.env.BASE_URL_AI || 'http://localhost:5001';
+export const BASE_URL_DETECTION =
+  process.env.BASE_URL_DETECTION || 'http://localhost:5005';
 export const NIMSPACE_AI_ID = process.env.NIMSPACE_AI_ID || '';
