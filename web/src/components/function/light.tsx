@@ -20,7 +20,7 @@ export default function LightCard({ id, deviceKey, value }) {
 
   async function toggleLight() {
     dispatch(appearSpinner());
-    const result = await toggleDevice("id", {
+    const result = await toggleDevice(id, {
       status: value > 0 ? "offline" : "online",
     });
 
@@ -66,7 +66,7 @@ export default function LightCard({ id, deviceKey, value }) {
             </div>
             <Slider
               disabled
-              value={value}
+              value={[50]}
               min={0}
               max={100}
               step={5}
