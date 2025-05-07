@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -17,7 +17,7 @@ import { MessageCircleQuestion, Send } from "lucide-react";
 import { getDevice } from "@/api/devices";
 import { redirect } from "next/navigation";
 import { getBlockingMessages, getDetection } from "@/api/chat.api";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { toast } from "sonner";
 

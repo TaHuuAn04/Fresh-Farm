@@ -3,7 +3,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ReduxProvider from "@/redux/provider";
 import Spinner from "@/components/spinner";
-import Footer from "@/components/footer";
 import { Toaster } from "sonner";
 
 const geistSans = Geist({
