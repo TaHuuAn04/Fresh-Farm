@@ -188,7 +188,7 @@ class LeafDetection:
         if not self.detection_results:
             return {
                 "status": "no_detection",
-                "message": "No objects were detected",
+                "message": "Notification: The farm status has been updated -> No leaf detected",
                 "counts": {},
                 "classes": [],
                 "total_objects": 0
@@ -291,5 +291,10 @@ class LeafDetection:
                 result["message"] = f"Plant shows severe disease ({diseased_count}/{total_labeled} leaves, {(100-healthy_ratio):.1f}%)"
         else:
             result["message"] = f"Detected {total_detections} objects, but unable to determine health status"
-            
+
+        if result["classes"].length > 0:
+            result["message"] = f"Notification: The farm status has been updated -> {result['classes'].join(', ')}"
+        else:
+            result["message"] = f"Notification: The farm status has been updated -> No leaf detected"
+
         return result

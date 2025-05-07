@@ -96,7 +96,6 @@ export class DevicesController {
     @CurrentUser() user: User,
     @Query('duration') duration: number,
   ): Promise<DetectionResponseDto> {
-    console.log('duration', duration);
     return this.devicesService.updateStatusFarm(user.id, duration);
   }
 }

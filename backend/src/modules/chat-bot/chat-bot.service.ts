@@ -268,6 +268,13 @@ export class ChatBotService implements IChatBotService {
     const conversation =
       await this.conversationRepository.getConversationByUserId(userId);
 
+    if (!conversation) {
+      return {
+        data: [],
+        total: 0,
+      };
+    }
+
     const user = await this.userRepository.findOneById(userId);
     if (!user) {
       throw new Error('User not found');
@@ -282,8 +289,6 @@ export class ChatBotService implements IChatBotService {
         'x-app-code': X_APP_CODE,
       },
     });
-
-    console.log(token.access_token);
 
     const difyResponse = await this.getMessagesByConversationIdPagination({
       token: token.access_token,
@@ -318,7 +323,6 @@ export class ChatBotService implements IChatBotService {
       const dto = new GetMessagesByConversationIdPaginationDifyAiDto(
         input.query,
       );
-      console.log('dto', dto);
       const response =
         await fetchDto<GetMessagesByConversationIdPaginationDifyAiResponseDto>({
           httpService: this.httpService,

@@ -225,8 +225,16 @@ export class DevicesService {
           'FAILED_TO_UPDATE_FARM_STATUS',
         );
       }
+
+      const content = response.data.detection_results.message;
+      // if (response.data.detection_results.classes.length > 0) {
+      //   content = `Notification: The farm status has been updated: ${response.data.detection_results.classes.join(', ')}`;
+      // } else {
+      //   content = `Notification: The farm status has been updated: No leaf detected`;
+      // }
+
       const notification: CreateNotificationDto = {
-        content: `Trạng thái trang trại đã được cập nhật là: Loại lá phát hiện là ${response.data.detection_results.classes.join(', ')}`,
+        content,
         time: new Date(),
         severity: Severity.MEDIUM,
       };

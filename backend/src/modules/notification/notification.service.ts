@@ -8,48 +8,51 @@ import { Notification } from '@entities';
 
 @Injectable()
 export class NotificationService {
-    private readonly logger = new Logger(NotificationService.name);
+  private readonly logger = new Logger(NotificationService.name);
 
-    constructor(
-        @Inject(NOTIFICATION_REPOSITORY)
-        private readonly notiRepository: INotificationRepository,
-    ) { }
+  constructor(
+    @Inject(NOTIFICATION_REPOSITORY)
+    private readonly notiRepository: INotificationRepository,
+  ) {}
 
-    async create(createNotiDto: CreateNotificationDto, userId: string): Promise<Notification> {
-        const newNoti = this.notiRepository.create({
-            ...createNotiDto,
-            userId
-        });
+  async create(
+    createNotiDto: CreateNotificationDto,
+    userId: string,
+  ): Promise<Notification> {
+    const newNoti = this.notiRepository.create({
+      ...createNotiDto,
+      userId,
+    });
 
-        return this.notiRepository.save(newNoti);
-    }
+    return this.notiRepository.save(newNoti);
+  }
 
-    async findAll(): Promise<Notification[]> {
-        const notifications = await this.notiRepository.find();
-        return notifications;
-    }
+  async findAll(): Promise<Notification[]> {
+    const notifications = await this.notiRepository.find();
+    return notifications;
+  }
 
-    async findOne(id: string): Promise<Notification> {
-        const notification = await this.notiRepository.findOneById(id);
-        if (!notification)
-            throw new AppError(
-                HttpStatus.NOT_FOUND,
-                'Notification not found',
-                'NOTIFICATION_NOT_FOUND',
-            );
+  async findOne(id: string): Promise<Notification> {
+    const notification = await this.notiRepository.findOneById(id);
+    if (!notification)
+      throw new AppError(
+        HttpStatus.NOT_FOUND,
+        'Notification not found',
+        'NOTIFICATION_NOT_FOUND',
+      );
 
-        return notification;
-    }
+    return notification;
+  }
 
-    async remove(id: string): Promise<void> {
-        const notification = await this.notiRepository.findOneById(id);
-        if (!notification)
-            throw new AppError(
-                HttpStatus.NOT_FOUND,
-                'Notification not found',
-                'NOTIFICATION_NOT_FOUND',
-            );
+  async remove(id: string): Promise<void> {
+    const notification = await this.notiRepository.findOneById(id);
+    if (!notification)
+      throw new AppError(
+        HttpStatus.NOT_FOUND,
+        'Notification not found',
+        'NOTIFICATION_NOT_FOUND',
+      );
 
-        await this.notiRepository.remove(notification);
-    }
+    await this.notiRepository.remove(notification);
+  }
 }
