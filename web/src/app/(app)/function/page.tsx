@@ -5,29 +5,44 @@ import { lazy, Suspense, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "sonner";
 import { io, Socket } from "socket.io-client";
-import { Device } from "@/utils/constant";
 
 const TemperatureCard = lazy(() => import("@/components/function/temperature"));
 const FanCard = lazy(() => import("@/components/function/fan"));
 const HumidityCard = lazy(() => import("@/components/function/humidity"));
 const LightCard = lazy(() => import("@/components/function/light"));
 
+interface Device {
+  id: string;
+  deviceKey: string;
+  type: string;
+  value: string;
+}
+
 export default function FunctionPage() {
   const userId = useSelector((state: RootState) => state.user.id);
-  const [listDevice, setListDevice] = useState<Device[]>([]);
+  const [listDevice, setListDevice] = useState([]);
   const [socket, setSocket] = useState<Socket | null>(null);
-  console.log(socket);
 
   useEffect(() => {
     async function firstFetch() {
       const result = await getUserDevice();
 
-      if (!result || result.status > 299) {
-        toast("Error", { description: "Error while getting devices" });
+      if (result?.status > 299) {
+        toast("Error", {
+          description: "Error while getting devices",
+        });
         return;
       }
 
-      setListDevice(result.data.data);
+      // const temp = result?.data?.data.map((device) => {
+      //   if (device?.value) return device;
+      //   return {
+      //     ...device,
+      //     value: 0,
+      //   };
+      // });
+
+      setListDevice(result?.data?.data);
     }
 
     firstFetch();
@@ -83,6 +98,7 @@ export default function FunctionPage() {
   const renderDeviceCard = (device: Device) => {
     const props = {
       id: device.id,
+      deviceKey: device.deviceKey,
       value: device.value,
     };
 

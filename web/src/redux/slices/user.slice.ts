@@ -8,8 +8,6 @@ interface InitialState {
   phoneNumber: string;
   id: string;
   isAuthenticated: boolean;
-  accessToken: string;
-  refreshToken: string;
 }
 
 const initialState: InitialState = {
@@ -20,8 +18,6 @@ const initialState: InitialState = {
   phoneNumber: "",
   id: "",
   isAuthenticated: false,
-  refreshToken: "",
-  accessToken: "",
 };
 
 const userSlice = createSlice({

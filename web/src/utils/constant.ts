@@ -4,16 +4,12 @@ import {
   Wrench,
   LogOut,
   BotMessageSquare,
-  LucideProps,
 } from "lucide-react";
-import { ForwardRefExoticComponent, RefAttributes } from "react";
 
 type sidebarType = {
   title: string;
   url: string;
-  icon: ForwardRefExoticComponent<
-    Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>
-  >;
+  icon: any;
 };
 
 export const sidebarData: sidebarType[] = [
@@ -91,73 +87,6 @@ export interface BlockingMessageDto {
 export interface LoginDto {
   phone_number: string;
   password: string;
-}
-
-export interface Device {
-  createdAt?: Date;
-  description: string;
-  id: string;
-  key: string;
-  name: string;
-  ownerId: string;
-  status: string;
-  type: string;
-  updatedAt?: Date;
-  value: string;
-}
-
-export interface DeviceProps {
-  value: string;
-}
-
-export interface ToggleDeviceProps {
-  value: string;
-  id: string;
-}
-
-export interface Notification {
-  content: string;
-  createdAt?: string;
-  id: string;
-  severity: string;
-  time?: string;
-  updatedAt?: string;
-  userId: string;
-}
-
-export interface NotificationData {
-  content: string;
-  createdAt?: Date;
-  id: string;
-  severity: string;
-  time?: Date;
-  updatedAt?: Date;
-  userId: string;
-  stt: number;
-}
-
-export interface Login {
-  age: number;
-  createdAt: string;
-  email: string;
-  fullName: string;
-  id: string;
-  lastTimeBlocked: null;
-  password: string;
-  phone_number: string;
-  refreshToken: string;
-  role: string;
-  status: string;
-  updatedAt: string;
-}
-
-export interface ApiResponse<T> {
-  status: number;
-  data: {
-    statusCode: number;
-    message: string;
-    data: T;
-  };
 }
 
 // This is a mock implementation of the getDevice function
