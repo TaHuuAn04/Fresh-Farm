@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Req,
+  Query,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { DevicesService } from './devices.service';
@@ -16,18 +17,24 @@ import { UpdateDeviceDto } from '@modules/devices/dtos/updateDevice.dto';
 import { ToggleDeviceDto } from '@modules/devices/dtos/toggleDevice.dto';
 import JwtAuthGuard from '@modules/auth/guard/jwtAuth.guard';
 import RequestWithUser from '@modules/auth/interface/requestWithUser.interface';
+import { CurrentUser } from '@common/decorators/current-user.decorator';
+import { User } from '@entities';
+import { DetectionResponseDto } from './dtos/detection.dto';
 
 @ApiTags('Devices')
 @Controller('devices')
 export class DevicesController {
-  constructor(private readonly devicesService: DevicesService) { }
+  constructor(private readonly devicesService: DevicesService) {}
 
   @UseGuards(JwtAuthGuard)
   @Post()
   @ApiOperation({ summary: 'Tạo một thiết bị mới' })
   @ApiResponse({ status: 201, description: 'Thiết bị được tạo thành công' })
   @ApiResponse({ status: 400, description: 'Dữ liệu không hợp lệ' })
-  async create(@Req() request: RequestWithUser, @Body() createDeviceDto: CreateDeviceDto) {
+  async create(
+    @Req() request: RequestWithUser,
+    @Body() createDeviceDto: CreateDeviceDto,
+  ) {
     return this.devicesService.create(createDeviceDto, request.user.id);
   }
 
@@ -77,5 +84,19 @@ export class DevicesController {
     @Body() toggleDeviceDto: ToggleDeviceDto,
   ) {
     return this.devicesService.toggleStatus(id, toggleDeviceDto);
+  }
+
+  @Post('status-farm')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'update status farm' })
+  @ApiParam({
+    name: 'duration',
+  })
+  async updateStatusFarm(
+    @CurrentUser() user: User,
+    @Query('duration') duration: number,
+  ): Promise<DetectionResponseDto> {
+    console.log('duration', duration);
+    return this.devicesService.updateStatusFarm(user.id, duration);
   }
 }
