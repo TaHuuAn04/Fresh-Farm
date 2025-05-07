@@ -20,7 +20,7 @@ interface Device {
 
 export default function FunctionPage() {
   const userId = useSelector((state: RootState) => state.user.id);
-  const [listDevice, setListDevice] = useState<Device[]>([]);
+  const [listDevice, setListDevice] = useState([]);
   const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
@@ -34,6 +34,14 @@ export default function FunctionPage() {
         return;
       }
 
+      // const temp = result?.data?.data.map((device) => {
+      //   if (device?.value) return device;
+      //   return {
+      //     ...device,
+      //     value: 0,
+      //   };
+      // });
+
       setListDevice(result?.data?.data);
     }
 
@@ -43,9 +51,8 @@ export default function FunctionPage() {
   useEffect(() => {
     if (!userId) return;
 
-    const socketIo = io("http://localhost:3010/user", {
+    const socketIo = io("ws://localhost:3010/user", {
       query: { userId },
-      transports: ["websocket"],
     });
 
     socketIo.on("connect", () => {
@@ -130,7 +137,7 @@ export default function FunctionPage() {
       <h1 className="text-3xl font-bold mb-6">Fresh Farm Control Panel</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {listDevice.length > 0 ? (
+        {listDevice?.length > 0 ? (
           listDevice.map((device) => renderDeviceCard(device))
         ) : (
           <p>No devices found.</p>
