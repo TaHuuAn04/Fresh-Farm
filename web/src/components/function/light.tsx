@@ -14,14 +14,15 @@ import { toggleDevice } from "@/api/devices";
 import { toast } from "sonner";
 import { useDispatch } from "react-redux";
 import { appearSpinner, disappearSpinner } from "@/redux/slices/spinnerSlice";
+import { ToggleDeviceProps } from "@/utils/constant";
 
-export default function LightCard({ id, deviceKey, value }) {
+export default function LightCard({ id, value }: ToggleDeviceProps) {
   const dispatch = useDispatch();
 
   async function toggleLight() {
     dispatch(appearSpinner());
     const result = await toggleDevice(id, {
-      status: value > 0 ? "offline" : "online",
+      status: +value > 0 ? "offline" : "online",
     });
 
     if (result?.statusCode && result?.statusCode > 299) {
@@ -39,7 +40,7 @@ export default function LightCard({ id, deviceKey, value }) {
         <CardTitle className="flex items-center gap-2">
           <Sun
             className={`h-5 w-5 ${
-              value > 0 ? "text-yellow-500" : "text-gray-500"
+              +value > 0 ? "text-yellow-500" : "text-gray-500"
             }`}
           />
           <span>Light Control</span>
@@ -50,13 +51,13 @@ export default function LightCard({ id, deviceKey, value }) {
         <div className="flex flex-col items-center">
           <div className="mb-4 flex items-center gap-4">
             <span className="text-sm">Status:</span>
-            <Switch checked={value > 0} onCheckedChange={toggleLight} />
+            <Switch checked={+value > 0} onCheckedChange={toggleLight} />
             <span
               className={`text-sm font-medium ${
-                value > 0 ? "text-green-500" : "text-gray-500"
+                +value > 0 ? "text-green-500" : "text-gray-500"
               }`}
             >
-              {value > 0 ? "On" : "Off"}
+              {+value > 0 ? "On" : "Off"}
             </span>
           </div>
           <div className="w-full space-y-2 mt-7">
@@ -70,7 +71,7 @@ export default function LightCard({ id, deviceKey, value }) {
               min={0}
               max={100}
               step={5}
-              className={value > 0 ? "" : "opacity-50"}
+              className={+value > 0 ? "" : "opacity-50"}
             />
           </div>
         </div>

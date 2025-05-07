@@ -1,6 +1,4 @@
-import { getDevice } from "@/api/devices";
 import LoginForm from "../../components/auth/login";
-import { redirect } from "next/navigation";
 
 export default function Home() {
   return (

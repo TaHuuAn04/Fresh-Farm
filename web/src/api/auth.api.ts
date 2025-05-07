@@ -1,10 +1,11 @@
 import {
+  ApiResponse,
+  Login,
   LoginDto,
   RegisterType,
   ResetPasswordRequest,
   VerifyOTPType,
 } from "@/utils/constant";
-import axios from "axios";
 import axiosInstance from "./axios-interceptor.api";
 
 export async function register(payload: RegisterType) {
@@ -70,14 +71,16 @@ export async function requestResetPassword(data: ResetPasswordRequest) {
   }
 }
 
-export async function login(data: LoginDto) {
+export async function login(
+  data: LoginDto
+): Promise<ApiResponse<Login> | null> {
   try {
     const res = await axiosInstance.post(`/auth/log-in`, data);
-    console.log("reds", res);
     return res;
   } catch (error) {
     console.log(error);
-    return error;
+
+    return null;
   }
 }
 
@@ -103,7 +106,7 @@ export async function logout() {
   }
 }
 
-export async function getUserInformation() {
+export async function getUserInformation(): Promise<ApiResponse<Login> | null> {
   try {
     const res = await axiosInstance.get("/auth/me");
     console.log(res);
@@ -112,6 +115,6 @@ export async function getUserInformation() {
   } catch (error) {
     console.log(error);
 
-    return error;
+    return null;
   }
 }

@@ -23,27 +23,25 @@ export default function LoginForm() {
 
     const response = await login({ phone_number: phoneNumber, password });
 
-    if (response?.status < 300) {
+    if (response && response?.status < 300) {
       toast.success("Success", {
         description: "Đăng nhập thành công",
       });
 
       dispatch(
         changeState({
-          fullName: response?.data?.fullName,
-          role: response?.data?.role,
-          age: response?.data?.age,
-          phoneNumber: response?.data?.phone_number,
-          email: response?.data?.email,
-          id: response?.data?.id,
+          fullName: response?.data?.data?.fullName,
+          role: response?.data?.data?.role,
+          age: response?.data?.data?.age,
+          phoneNumber: response?.data?.data?.phone_number,
+          email: response?.data?.data?.email,
+          id: response?.data?.data?.id,
         })
       );
       router.push("/home");
     } else {
       toast.error("Failure", {
-        description:
-          response?.response?.data?.message[0] ||
-          "Sai tên đăng nhập hoặc mật khẩu",
+        description: "Sai tên đăng nhập hoặc mật khẩu",
       });
     }
   };
