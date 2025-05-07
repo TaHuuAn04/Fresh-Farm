@@ -7,6 +7,8 @@ import {
   GetPassportDifyAiInputDto,
   GetPassportDifyAiResponseDto,
 } from './dtos/passport.dto';
+import { PaginatedResult } from './dtos/paginated-result.dto';
+import { ChatMessageItemDto } from './dtos/conversation.dto';
 
 export interface IChatBotService {
   /**
@@ -62,4 +64,11 @@ export interface IChatBotService {
     messageId: string,
     userId: string,
   ): Promise<void>;
+
+  /**
+   * Get conversation
+   * @param userId
+   * @returns
+   */
+  getConversation(userId: string): Promise<PaginatedResult<ChatMessageItemDto>>;
 }

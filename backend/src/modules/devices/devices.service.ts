@@ -153,14 +153,16 @@ export class DevicesService {
   async findDevicesByUserId(userId: string) {
     const devices = await this.deviceRepository.findDevicesByUserId(userId);
 
-    const devicesWithFeed = await Promise.all(devices?.map(async (device) => {
-      const feedOfDevice = await this.adafruitService.getFeed(device.key);
+    const devicesWithFeed = await Promise.all(
+      devices?.map(async (device) => {
+        const feedOfDevice = await this.adafruitService.getFeed(device.key);
 
-      return {
-        ...device,
-        value: feedOfDevice?.last_value || 0
-      };
-    }) || []); // Ensure it's never undefined
+        return {
+          ...device,
+          value: feedOfDevice?.last_value || 0,
+        };
+      }) || [],
+    ); // Ensure it's never undefined
 
     return devicesWithFeed;
   }
@@ -183,20 +185,20 @@ export class DevicesService {
     }
   }
 
-  @Cron('15 6 * * *') 
+  @Cron('15 6 * * *')
   async turnOffPump() {
     const devices = await this.deviceRepository.findPump();
     if (!devices) return;
-  
+
     for (const device of devices) {
       await this.adafruitService.toggleFeedStatus(device.key, '0');
-  
+
       const notification: CreateNotificationDto = {
         content: `Thiết bị bơm ${device.name} đã được tắt vào lúc 6:15 sáng.`,
         time: new Date(),
-        severity: Severity.MEDIUM
+        severity: Severity.MEDIUM,
       };
-  
+
       await this.notiService.create(notification, device.ownerId);
     }
   }
