@@ -183,6 +183,24 @@ export class DevicesService {
     }
   }
 
+  @Cron('15 6 * * *') 
+  async turnOffPump() {
+    const devices = await this.deviceRepository.findPump();
+    if (!devices) return;
+  
+    for (const device of devices) {
+      await this.adafruitService.toggleFeedStatus(device.key, '0');
+  
+      const notification: CreateNotificationDto = {
+        content: `Thiết bị bơm ${device.name} đã được tắt vào lúc 6:15 sáng.`,
+        time: new Date(),
+        severity: Severity.MEDIUM
+      };
+  
+      await this.notiService.create(notification, device.ownerId);
+    }
+  }
+
   async updateStatusFarm(
     userId: string,
     duration: number,

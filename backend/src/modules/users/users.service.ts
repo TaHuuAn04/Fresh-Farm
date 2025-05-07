@@ -218,7 +218,6 @@ export class UsersService {
   async update(id: string, updateDto: UpdateUserDto) {
     try {
       const user = await this.usersRepository.findOneById(id);
-      console.log(user);
 
       if (!user) {
         throw new AppError(
