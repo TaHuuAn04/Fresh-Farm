@@ -12,6 +12,10 @@ import { DEVICE_REPOSITORY } from '@common/constants';
 import { Cron } from '@nestjs/schedule';
 import { CreateNotificationDto } from '@modules/notification/dtos/createNotification.dto';
 import { NotificationService } from '@modules/notification/notification.service';
+import { fetchDto } from 'src/http';
+import { DetectionResponseDto, PostDetectionDto } from './dtos/detection.dto';
+import { HttpService } from '@nestjs/axios';
+import { AxiosHeaders } from 'axios';
 
 @Injectable()
 export class DevicesService {
@@ -21,10 +25,14 @@ export class DevicesService {
     @Inject(DEVICE_REPOSITORY)
     private readonly deviceRepository: IDeviceRepository,
     private readonly adafruitService: AdafruitService,
-    private readonly notiService: NotificationService
-  ) { }
+    private readonly notiService: NotificationService,
+    private readonly httpService: HttpService,
+  ) {}
 
-  async create(createDeviceDto: CreateDeviceDto, userId: string): Promise<Device> {
+  async create(
+    createDeviceDto: CreateDeviceDto,
+    userId: string,
+  ): Promise<Device> {
     const deviceKey = uuidv4();
 
     await this.adafruitService.createFeed(
@@ -38,7 +46,7 @@ export class DevicesService {
       ...createDeviceDto,
       status: DeviceStatus.OFFLINE,
       key: deviceKey,
-      ownerId: userId
+      ownerId: userId,
     });
 
     return this.deviceRepository.save(newDevice);
@@ -157,7 +165,6 @@ export class DevicesService {
     return devicesWithFeed;
   }
 
-
   @Cron('0 6 * * *') // Mỗi ngày lúc 6h sáng
   async runPump() {
     const devices = await this.deviceRepository.findPump();
@@ -169,14 +176,14 @@ export class DevicesService {
       const notification: CreateNotificationDto = {
         content: `Thiết bị bơm ${device.name} đã được kích hoạt tự động lúc 6h sáng.`,
         time: new Date(),
-        severity: Severity.MEDIUM
+        severity: Severity.MEDIUM,
       };
 
       await this.notiService.create(notification, device.ownerId);
     }
   }
-  
-  @Cron('15 6 * * *') // Mỗi ngày lúc 6:15 sáng
+
+  @Cron('15 6 * * *') 
   async turnOffPump() {
     const devices = await this.deviceRepository.findPump();
     if (!devices) return;
@@ -191,6 +198,47 @@ export class DevicesService {
       };
   
       await this.notiService.create(notification, device.ownerId);
+    }
+  }
+
+  async updateStatusFarm(
+    userId: string,
+    duration: number,
+  ): Promise<DetectionResponseDto> {
+    const dto = new PostDetectionDto({ duration });
+
+    try {
+      const response = await fetchDto<DetectionResponseDto>({
+        dto,
+        httpService: this.httpService,
+        headers: new AxiosHeaders({
+          'Content-Type': 'application/json',
+        }),
+      });
+
+      if (!response.data.status) {
+        throw new AppError(
+          HttpStatus.INTERNAL_SERVER_ERROR,
+          'Failed to update farm status',
+          'FAILED_TO_UPDATE_FARM_STATUS',
+        );
+      }
+      const notification: CreateNotificationDto = {
+        content: `Trạng thái trang trại đã được cập nhật là: Loại lá phát hiện là ${response.data.detection_results.classes.join(', ')}`,
+        time: new Date(),
+        severity: Severity.MEDIUM,
+      };
+
+      await this.notiService.create(notification, userId);
+
+      return response.data;
+    } catch (error) {
+      this.logger.error(error);
+      throw new AppError(
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        'Failed to update farm status',
+        'FAILED_TO_UPDATE_FARM_STATUS',
+      );
     }
   }
 }

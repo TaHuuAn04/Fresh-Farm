@@ -30,6 +30,8 @@ export async function fetchDto<T>(data: {
 }): Promise<IFetchDtoResponse<T>> {
   const { dto, httpService, headers } = data;
   const url = dto.interpolatedUrl;
+  console.log('url', url);
+  console.log('headers', headers);
   const method = dto.method;
   const responseMessage = 'success';
 
@@ -51,6 +53,7 @@ export async function fetchDto<T>(data: {
       },
       data: isFormData ? formData : dto.bodyDto,
     };
+    console.log('config', config);
 
     const response = httpService.request<T>(config);
 
