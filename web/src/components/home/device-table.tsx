@@ -12,22 +12,21 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useDispatch, useSelector } from "react-redux";
 import { appearSpinner, disappearSpinner } from "@/redux/slices/spinnerSlice";
-import { getUserDevice } from "@/api/devices";
+import { getAllDevices, getUserDevice } from "@/api/devices";
 import { RootState } from "@/redux/store";
 import { toast } from "sonner";
-import { Device } from "@/utils/constant";
 
-// interface Device {
-//   id: string;
-//   name: string;
-//   status: string;
-//   key: string;
-//   description: string | null;
-//   created_at: string;
-//   updated_at: string;
-//   ownerId: string | null;
-//   last_value: string;
-// }
+interface Device {
+  id: string;
+  name: string;
+  status: string;
+  key: string;
+  description: string | null;
+  created_at: string;
+  updated_at: string;
+  ownerId: string | null;
+  last_value: string;
+}
 
 export default function DeviceTable() {
   const [sortColumn, setSortColumn] = useState<keyof Device | null>(null);
@@ -40,8 +39,9 @@ export default function DeviceTable() {
     const firstFetch = async () => {
       dispatch(appearSpinner());
       const result = await getUserDevice();
+      console.log(result);
 
-      if (!result || result?.status > 299) {
+      if (result?.status > 299) {
         toast("Failure", {
           description: "Fail to get user's devices",
         });
@@ -52,7 +52,7 @@ export default function DeviceTable() {
     };
 
     firstFetch();
-  }, [reload, dispatch]);
+  }, [reload]);
 
   const handleSort = (column: keyof Device) => {
     if (sortColumn === column) {

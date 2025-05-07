@@ -81,7 +81,7 @@ export function CreateDeviceDialog() {
     };
 
     dispatch(appearSpinner());
-    await createDevice(dataApi);
+    const result = await createDevice(dataApi);
 
     dispatch(setReload());
     setDeviceName("");

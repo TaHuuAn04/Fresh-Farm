@@ -1,7 +1,5 @@
 import {
-  ApiResponse,
   CreateDeviceDto,
-  Device,
   ToggleDeviceDto,
   UpdateDeviceDto,
 } from "@/utils/constant";
@@ -29,14 +27,15 @@ export async function getDevice(id: string) {
   }
 }
 
-export async function getUserDevice(): Promise<ApiResponse<Device[]> | null> {
+export async function getUserDevice() {
   try {
     const res = await axiosInstance.get(`/devices/me`);
+    // console.log("res", res);
+
     return res;
   } catch (error) {
-    console.log(error);
-
-    return null;
+    console.log("Error when get specific device", error);
+    return error;
   }
 }
 

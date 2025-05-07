@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ArrowUpDown } from "lucide-react";
-import { format, parseISO } from "date-fns";
+import { format } from "date-fns";
 
 import {
   type ColumnDef,
@@ -32,77 +32,75 @@ import { getNotifications } from "@/api/notification.api";
 import { useDispatch } from "react-redux";
 import { toast } from "sonner";
 import { appearSpinner, disappearSpinner } from "@/redux/slices/spinnerSlice";
-import { Notification } from "@/utils/constant";
 
-type Severity = "low" | "medium" | "high" | "critical";
-
-export interface NotificationData {
+// Define the data type for history records
+type HistoryRecord = {
   id: string;
-  content: string;
-  severity: Severity;
-  time: string;
   stt: number;
-  createdAt?: string;
-  updatedAt?: string;
-  userId: string;
-}
-
-const variants: Record<Severity, string> = {
-  low: "bg-green-100 text-green-800 hover:bg-green-100",
-  medium: "bg-yellow-100 text-yellow-800 hover:bg-yellow-100",
-  high: "bg-orange-100 text-orange-800 hover:bg-orange-100",
-  critical: "bg-red-100 text-red-800 hover:bg-red-100",
+  content: string;
+  time: Date;
+  severity: "low" | "medium" | "high" | "critical";
 };
 
-const getSeverityBadge = (severity: Severity) => (
-  <Badge className={`px-2 py-1 ${variants[severity]}`}>
-    {severity.charAt(0).toUpperCase() + severity.slice(1)}
-  </Badge>
-);
+// Helper function to get severity badge
+const getSeverityBadge = (severity: HistoryRecord["severity"]) => {
+  const variants = {
+    low: "bg-green-100 text-green-800 hover:bg-green-100",
+    medium: "bg-yellow-100 text-yellow-800 hover:bg-yellow-100",
+    high: "bg-orange-100 text-orange-800 hover:bg-orange-100",
+    critical: "bg-red-100 text-red-800 hover:bg-red-100",
+  };
 
-/* ------------------------------------------------------------------
- * Table columns
- * ------------------------------------------------------------------*/
+  return (
+    <Badge className={`px-2 py-1 ${variants[severity]}`}>
+      {severity.charAt(0).toUpperCase() + severity.slice(1)}
+    </Badge>
+  );
+};
 
-const columns: ColumnDef<NotificationData>[] = [
+// Define table columns
+const columns: ColumnDef<HistoryRecord>[] = [
   {
     accessorKey: "stt",
     header: "STT",
-    cell: ({ row }) => <div className="text-center">{row.getValue("stt")}</div>,
+    cell: ({ row }) => <div className="">{row.getValue("stt")}</div>,
   },
   {
     accessorKey: "content",
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        className="p-0 hover:bg-transparent flex items-center"
-      >
-        Content
-        <ArrowUpDown className="ml-2 h-4 w-4" />
-      </Button>
-    ),
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="p-0 hover:bg-transparent"
+        >
+          Content
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
     cell: ({ row }) => <div>{row.getValue("content")}</div>,
   },
   {
-    accessorKey: "time",
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        className="p-0 hover:bg-transparent whitespace-nowrap flex items-center"
-      >
-        Time
-        <ArrowUpDown className="ml-2 h-4 w-4" />
-      </Button>
-    ),
+    accessorKey: "timestamp",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="p-0 hover:bg-transparent whitespace-nowrap"
+        >
+          Time
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
     cell: ({ row }) => {
-      const iso = row.getValue<string>("time");
-      if (!iso) return "-";
-      const date = parseISO(iso);
+      // const timestamp = row.getValue("time") as Date;
+      const timestamp = new Date();
       return (
         <div className="whitespace-nowrap">
-          {format(date, "dd/MM/yyyy HH:mm")}
+          {format(timestamp, "dd/MM/yyyy HH:mm")}
         </div>
       );
     },
@@ -110,68 +108,60 @@ const columns: ColumnDef<NotificationData>[] = [
   },
   {
     accessorKey: "severity",
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        className="p-0 hover:bg-transparent flex items-center"
-      >
-        Severity
-        <ArrowUpDown className="ml-2 h-4 w-4" />
-      </Button>
-    ),
-    cell: ({ row }) => {
-      const severity = row.getValue<Severity>("severity");
+    header: ({ column }) => {
       return (
-        <div className="flex justify-center">{getSeverityBadge(severity)}</div>
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="p-0 hover:bg-transparent"
+        >
+          Severity
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
       );
+    },
+    cell: ({ row }) => {
+      const severity = row.getValue("severity") as HistoryRecord["severity"];
+      return <div className="">{getSeverityBadge(severity)}</div>;
     },
   },
 ];
 
 export function HistoryTable() {
   const dispatch = useDispatch();
-  const [data, setData] = useState<NotificationData[]>([]);
+  const [data, setData] = useState([]);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
 
-  // Fetch
   useEffect(() => {
-    const firstFetch = async (): Promise<void> => {
+    const firstFetch = async () => {
       dispatch(appearSpinner());
       const result = await getNotifications();
 
-      if (result && result.status > 299) {
-        toast("Failure", { description: "Fail to get notifications" });
-        dispatch(disappearSpinner());
+      if (result?.status > 299) {
+        toast("Failure", {
+          description: "Fail to get notications",
+        });
         return;
       }
 
-      if (!result) return;
+      const temp = result?.data?.data.map((item, index) => ({
+        ...item,
+        stt: index + 1,
+      }));
 
-      const temp: NotificationData[] = (result?.data?.data).map(
-        (item: Notification, idx: number) => ({
-          id: item.id,
-          content: item.content,
-          severity: item.severity as Severity,
-          time: item.time ?? item.createdAt ?? new Date().toISOString(),
-          stt: idx + 1,
-          createdAt: item.createdAt,
-          updatedAt: item.updatedAt,
-          userId: item.userId,
-        })
-      );
       setData(temp);
+
       dispatch(disappearSpinner());
     };
 
-    void firstFetch();
-  }, [dispatch]);
+    firstFetch();
+  }, []);
 
-  const table = useReactTable<NotificationData>({
-    data, // luôn là mảng, không undefined ⇒ ESLint ok
+  const table = useReactTable({
+    data,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -191,19 +181,16 @@ export function HistoryTable() {
 
   return (
     <div className="w-full">
-      {/* Filter */}
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter content..."
           value={(table.getColumn("content")?.getFilterValue() as string) ?? ""}
-          onChange={(e) =>
-            table.getColumn("content")?.setFilterValue(e.target.value)
+          onChange={(event) =>
+            table.getColumn("content")?.setFilterValue(event.target.value)
           }
           className="max-w-sm border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         />
       </div>
-
-      {/* Table */}
       <div className="rounded-md border border-gray-200 shadow-sm">
         <Table>
           <TableHeader>
@@ -215,7 +202,7 @@ export function HistoryTable() {
                 {headerGroup.headers.map((header) => (
                   <TableHead
                     key={header.id}
-                    className="px-4 py-3 text-sm font-semibold text-gray-900 text-center"
+                    className="px-4 py-3 text-left text-sm font-semibold text-gray-900"
                   >
                     {header.isPlaceholder
                       ? null
@@ -229,7 +216,7 @@ export function HistoryTable() {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows.length ? (
+            {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
@@ -239,7 +226,7 @@ export function HistoryTable() {
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
-                      className="px-4 py-3 text-sm text-gray-700 text-center"
+                      className="px-4 py-3 text-sm text-gray-700"
                     >
                       {flexRender(
                         cell.column.columnDef.cell,
@@ -262,8 +249,6 @@ export function HistoryTable() {
           </TableBody>
         </Table>
       </div>
-
-      {/* Pagination */}
       <div className="flex items-center justify-between py-4">
         <div className="text-sm text-gray-500">
           {table.getFilteredRowModel().rows.length} record(s) total

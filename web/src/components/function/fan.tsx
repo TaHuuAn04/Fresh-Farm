@@ -10,22 +10,20 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useState } from "react";
-import { toggleDevice } from "@/api/devices";
+import { useEffect, useState } from "react";
+import { getDevice, toggleDevice } from "@/api/devices";
 import { toast } from "sonner";
 import { useDispatch } from "react-redux";
 import { appearSpinner, disappearSpinner } from "@/redux/slices/spinnerSlice";
-import { ToggleDeviceProps } from "@/utils/constant";
 
-export default function FanCard({ id, value }: ToggleDeviceProps) {
+export default function FanCard({ id, deviceKey, value }) {
   const dispatch = useDispatch();
   const [controlState, setControlState] = useState<boolean>(false);
-  console.log(controlState);
 
   async function toggleFan() {
     dispatch(appearSpinner());
     const result = await toggleDevice(id, {
-      status: +value > 0 ? "offline" : "online",
+      status: value > 0 ? "offline" : "online",
     }); // Gửi trạng thái mới
     if (result?.statusCode && result?.statusCode < 300)
       setControlState((prev) => !prev);
@@ -44,11 +42,11 @@ export default function FanCard({ id, value }: ToggleDeviceProps) {
         <CardTitle className="flex items-center gap-2">
           <Fan
             className={`h-5 w-5 ${
-              +value > 0 ? "text-green-500" : "text-gray-500"
+              value > 0 ? "text-green-500" : "text-gray-500"
             }`}
           />
           <span>Fan Control</span>
-          {+value > 0 && (
+          {value > 0 && (
             <Badge variant="outline" className="animate-pulse">
               Active
             </Badge>
@@ -60,14 +58,14 @@ export default function FanCard({ id, value }: ToggleDeviceProps) {
         <div className="flex flex-col items-center mt-5">
           <div className="mb-6">
             <Button
-              variant={+value > 0 ? "default" : "outline"}
+              variant={value > 0 ? "default" : "outline"}
               size="lg"
               onClick={toggleFan}
               className="h-16 w-16 rounded-full"
             >
               <Power
                 className={`h-8 w-8 ${
-                  +value > 0 ? "text-white" : "text-gray-500"
+                  value > 0 ? "text-white" : "text-gray-500"
                 }`}
               />
             </Button>

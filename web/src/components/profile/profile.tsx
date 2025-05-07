@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -55,21 +55,20 @@ const profileFormSchema = z.object({
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
 export default function ProfileForm() {
-  const isAuthenticated: boolean = useSelector(
-    (state: RootState) => state.user.isAuthenticated
-  );
   const [isLoading, setIsLoading] = useState(false);
   const user = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch();
 
+  const defaultValues: ProfileFormValues = {
+    fullName: user?.fullName || "John Doe",
+    age: user?.age ? String(user.age) : "30",
+    email: user?.email || "",
+    phoneNumber: user?.phoneNumber || "0123456789",
+  };
+
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
-    defaultValues: {
-      fullName: "",
-      age: "",
-      email: "",
-      phoneNumber: "",
-    },
+    defaultValues,
   });
 
   useEffect(() => {
@@ -83,16 +82,20 @@ export default function ProfileForm() {
     }
   }, [user, isAuthenticated, form]);
 
+  // Handle form submission
+
   async function onSubmit(data: ProfileFormValues) {
     setIsLoading(true);
     try {
+      // Call the updateUser API with the form data
       const response = await updateUser(
         {
           ...data,
-          age: Number(data.age),
+          age: Number(data.age), // Convert age back to number if API expects a number
         },
         user?.id || ""
       );
+      console.log(data);
 
       if (response?.statusCode && response.statusCode >= 300) {
         toast.error("Error", {
@@ -112,10 +115,15 @@ export default function ProfileForm() {
         })
       );
 
+      // Assuming updateUser returns a success response
       toast.success("Success", {
         description: "Your profile information has been updated successfully.",
       });
+
+      // Optionally, you can reset the form or update Redux state here
+      console.log("Updated user data:", response);
     } catch (error) {
+      // Handle API errors
       toast.error("Error", {
         description: "Failed to update profile. Please try again.",
       });
