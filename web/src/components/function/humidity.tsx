@@ -11,9 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
-import { useEffect, useState } from "react";
-import { getDevice } from "@/api/devices";
-import { toast } from "sonner";
+import { useState } from "react";
 
 export default function HumidityCard({ id, deviceKey, value }) {
   const [humidState, setHumidState] = useState();

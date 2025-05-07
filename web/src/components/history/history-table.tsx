@@ -63,7 +63,7 @@ const columns: ColumnDef<HistoryRecord>[] = [
   {
     accessorKey: "stt",
     header: "STT",
-    cell: ({ row }) => <div className="text-center">{row.getValue("stt")}</div>,
+    cell: ({ row }) => <div className="">{row.getValue("stt")}</div>,
   },
   {
     accessorKey: "content",
@@ -122,9 +122,7 @@ const columns: ColumnDef<HistoryRecord>[] = [
     },
     cell: ({ row }) => {
       const severity = row.getValue("severity") as HistoryRecord["severity"];
-      return (
-        <div className="flex justify-center">{getSeverityBadge(severity)}</div>
-      );
+      return <div className="">{getSeverityBadge(severity)}</div>;
     },
   },
 ];
@@ -149,7 +147,12 @@ export function HistoryTable() {
         return;
       }
 
-      setData(result?.data?.data);
+      const temp = result?.data?.data.map((item, index) => ({
+        ...item,
+        stt: index + 1,
+      }));
+
+      setData(temp);
 
       dispatch(disappearSpinner());
     };
