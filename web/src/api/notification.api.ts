@@ -1,16 +1,13 @@
-import { ApiResponse, Notification } from "@/utils/constant";
 import axiosInstance from "./axios-interceptor.api";
 
-export async function getNotifications(): Promise<ApiResponse<
-  Notification[]
-> | null> {
+export async function getNotifications() {
   try {
     const res = await axiosInstance.get(`/notifications`);
+    // console.log("res", res);
 
     return res;
   } catch (error) {
-    console.log(error);
-
-    return null;
+    console.log("Error when get specific device", error);
+    return error;
   }
 }

@@ -1,70 +1,66 @@
-import axios, {
-  AxiosError,
-  AxiosInstance,
-  AxiosRequestConfig,
-  AxiosResponse,
-} from "axios";
+import axios from "axios";
 
-const axiosInstance: AxiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_BE_URL,
+const axiosInstance = axios.create({
+  baseURL: `${process.env.NEXT_PUBLIC_BE_URL}`,
   withCredentials: true,
 });
 
-type RefreshSubscriber = (token: string) => void;
+let isRefreshing: boolean = false;
+let refreshSubscribers = [];
 
-interface CustomRequestConfig extends AxiosRequestConfig {
-  sent?: boolean;
-}
-
-let isRefreshing = false;
-let refreshSubscribers: RefreshSubscriber[] = [];
-
-const onRefreshed = (newToken: string): void => {
+const onRefreshed = (newToken) => {
   refreshSubscribers.forEach((callback) => callback(newToken));
   refreshSubscribers = [];
 };
 
-const subscribeTokenRefresh = (callback: RefreshSubscriber): void => {
+const subscribeTokenRefresh = (callback) => {
   refreshSubscribers.push(callback);
 };
 
 axiosInstance.interceptors.response.use(
   (response) => response,
-  async (error: AxiosError): Promise<AxiosResponse | never> => {
-    const originalRequest = error.config as CustomRequestConfig;
+  async (error) => {
+    const originalRequest = error.config;
 
-    if (error.response?.status === 401 && !originalRequest.sent) {
+    if (error.response?.status === 401 && !originalRequest?.sent) {
       originalRequest.sent = true;
 
       if (!isRefreshing) {
         isRefreshing = true;
 
         try {
-          const result = await axiosInstance.post("/auth/refresh");
+          const result = await axiosInstance.post(`/auth/refresh`);
+          console.log("resu", result);
 
-          if (result.status > 299) {
-            // Redirect nếu refresh thất bại
-            if (window.location.pathname !== "/") window.location.href = "/";
-            throw new Error("Refresh token failed");
+          if (
+            result?.status > 299 &&
+            window.location.href !== "http://localhost:3001"
+          ) {
+            window.location.href = "/";
           }
 
           isRefreshing = false;
           onRefreshed("new-token");
           return axiosInstance(originalRequest);
-        } catch (refreshErr) {
+        } catch (refreshError) {
+          console.log("refresh");
+
           isRefreshing = false;
           refreshSubscribers = [];
 
-          if (window.location.pathname !== "/") window.location.href = "/";
-          return Promise.reject(refreshErr);
+          if (window.location.href !== "http://localhost:3001") {
+            window.location.href = "/";
+          }
+          return Promise.reject(refreshError);
         }
-      }
-
-      return new Promise<AxiosResponse>((resolve) => {
-        subscribeTokenRefresh(() => {
-          resolve(axiosInstance(originalRequest));
+      } else {
+        return new Promise((resolve) => {
+          console.log("Queueing request:", originalRequest.url);
+          subscribeTokenRefresh(() => {
+            resolve(axiosInstance(originalRequest));
+          });
         });
-      });
+      }
     }
 
     return Promise.reject(error);

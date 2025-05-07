@@ -11,9 +11,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
-import { DeviceProps } from "@/utils/constant";
+import { useState } from "react";
 
-export default function HumidityCard({ value }: DeviceProps) {
+export default function HumidityCard({ id, deviceKey, value }) {
+  const [humidState, setHumidState] = useState();
+
   return (
     <Card>
       <CardHeader className="pb-2">

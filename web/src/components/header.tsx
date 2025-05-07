@@ -2,7 +2,7 @@
 import { getUserInformation } from "@/api/auth.api";
 import { changeState } from "@/redux/slices/user.slice";
 import { RootState } from "@/redux/store";
-import { CircleUserRound } from "lucide-react";
+import { Mic, CircleUserRound } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -22,7 +22,7 @@ const Header = () => {
     const firstFetch = async () => {
       const result = await getUserInformation();
 
-      if (result && result?.status > 299) {
+      if (result?.status > 299) {
         router.push("/");
         return;
       }
@@ -43,7 +43,7 @@ const Header = () => {
     };
 
     if (!isAuthenticated) firstFetch();
-  }, [isAuthenticated, dispatch, router]);
+  }, [isAuthenticated]);
 
   return (
     <header className="w-full py-3 px-4 md:px-8 lg:px-12 bg-white">
