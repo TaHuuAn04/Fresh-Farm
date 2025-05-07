@@ -152,16 +152,16 @@ export class DevicesService {
 
   async findDevicesByUserId(userId: string) {
     const devices = await this.deviceRepository.findDevicesByUserId(userId);
-    
+
     const devicesWithFeed = await Promise.all(devices?.map(async (device) => {
       const feedOfDevice = await this.adafruitService.getFeed(device.key);
-      
+
       return {
         ...device,
-        value: feedOfDevice?.last_value
+        value: feedOfDevice?.last_value || 0
       };
     }) || []); // Ensure it's never undefined
-  
+
     return devicesWithFeed;
   }
 
