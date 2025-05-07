@@ -71,7 +71,19 @@ export default function ProfileForm() {
     defaultValues,
   });
 
+  useEffect(() => {
+    if (user && isAuthenticated) {
+      form.reset({
+        fullName: user.fullName || "",
+        age: user.age ? String(user.age) : "",
+        email: user.email || "",
+        phoneNumber: user.phoneNumber || "",
+      });
+    }
+  }, [user, isAuthenticated, form]);
+
   // Handle form submission
+
   async function onSubmit(data: ProfileFormValues) {
     setIsLoading(true);
     try {
