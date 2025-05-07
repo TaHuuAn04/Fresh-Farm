@@ -31,6 +31,8 @@ export class AdafruitService {
           },
         },
       );
+
+      console.log('Created feed on Adafruit:', response.data);
       return response.data;
     } catch (error) {
       console.error(

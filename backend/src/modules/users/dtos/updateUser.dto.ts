@@ -39,7 +39,7 @@ export class UpdateUserDto {
   @IsOptional()
   @IsString({ message: 'Phone number must be a string' })
   @Length(10, 10, { message: 'Phone number must be exactly 10 characters' })
-  phoneNumber: string;
+  phone_number: string;
 
   @ApiPropertyOptional({
     description: 'Password of the user',
