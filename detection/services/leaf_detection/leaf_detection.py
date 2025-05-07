@@ -196,7 +196,21 @@ class LeafDetection:
         
         all_classes = []
         confidence_scores = []
-        health_status = {"Healthy": 0, "Diseased": 0, "unknown": 0}
+        health_status = {
+            "Healthy": 0, 
+            "Diseased": 0, 
+            "unknown": 0,
+            "Bacterial Spot": 0,
+            "Early Blight": 0,
+            "Late Blight": 0,
+            "Leaf Mold": 0,
+            "Leaf Miner": 0,
+            "Mosaic Virus": 0,
+            "Septoria": 0,
+            "Spider Mites": 0,
+            "Yellow Leaf Curl Virus": 0,
+            "Plant Health": 0
+        }
         
         for frame_result in self.detection_results:
             for detection in frame_result:
@@ -250,7 +264,9 @@ class LeafDetection:
         }
         
         healthy_count = health_status["Healthy"]
-        diseased_count = health_status["Diseased"]
+        # Calculate total diseased count from all disease types
+        diseased_count = sum(count for key, count in health_status.items() 
+                           if key not in ["Healthy", "unknown", "Plant Health"])
         
         total_labeled = healthy_count + diseased_count
         if total_labeled > 0:
