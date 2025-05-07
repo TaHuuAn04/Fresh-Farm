@@ -72,7 +72,6 @@ export default function ProfileForm() {
     },
   });
 
-  // Reset form when user data changes
   useEffect(() => {
     if (user && isAuthenticated) {
       form.reset({
