@@ -164,7 +164,6 @@ export class UsersService {
 
   async findById(id: string): Promise<User | null> {
     try {
-      console.log(`Đang tìm kiếm thông tin người dùng ${id}...`);
       const user = await this.usersRepository.findOneById(id);
 
       return user;

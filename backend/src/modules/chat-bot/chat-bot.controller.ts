@@ -1,4 +1,12 @@
-import { Body, Controller, Inject, Post, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Inject,
+  Post,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { IChatBotService } from './chat-bot.interface';
 import { INJECTION_TOKEN } from '@common/enums/injection-token';
 import {
@@ -12,6 +20,10 @@ import JwtAuthGuard from '@modules/auth/guard/jwtAuth.guard';
 import { CurrentUser } from '@common/decorators/current-user.decorator';
 import { User } from '@entities';
 import { Response } from 'express';
+import { PageDto } from './dtos/page.dto';
+import { PageMetaDto } from './dtos/page-meta.dto';
+import { plainToInstance } from 'class-transformer';
+import { ChatMessageItemDto } from './dtos/conversation.dto';
 
 @ApiTags('ChatBot')
 @UseGuards(JwtAuthGuard)
@@ -60,5 +72,27 @@ export class ChatBotController {
     result.on('end', () => {
       res.end();
     });
+  }
+
+  @Get('conversation')
+  @ApiOperation({ summary: 'Get conversation' })
+  @ApiResponse({
+    status: 200,
+    description: 'Get conversation',
+  })
+  async getConversation(
+    @CurrentUser() user: User,
+  ): Promise<PageDto<ChatMessageItemDto>> {
+    const result = await this.chatBotService.getConversation(user.id);
+    const pageMeta = new PageMetaDto({
+      take: 10,
+      page: 1,
+      itemCount: result.total,
+    });
+
+    return new PageDto(
+      plainToInstance(ChatMessageItemDto, result.data),
+      pageMeta,
+    );
   }
 }

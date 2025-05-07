@@ -27,6 +27,14 @@ import { IDeviceRepository } from '@modules/devices/repositories/device.reposito
 import { plainToInstance } from 'class-transformer';
 import { ChatType } from '@common/enums';
 import { Readable } from 'stream';
+import {
+  ChatMessageItemDto,
+  GetMessagesByConversationIdPaginationDifyAiDto,
+  GetMessagesByConversationIdPaginationDifyAiInputDto,
+  GetMessagesByConversationIdPaginationDifyAiResponseDto,
+} from './dtos/conversation.dto';
+import { v5 as uuidv5 } from 'uuid';
+import { PaginatedResult } from './dtos/paginated-result.dto';
 
 @Injectable()
 export class ChatBotService implements IChatBotService {
@@ -252,5 +260,85 @@ export class ChatBotService implements IChatBotService {
       messageId: messageId,
       userId: userId,
     });
+  }
+
+  async getConversation(
+    userId: string,
+  ): Promise<PaginatedResult<ChatMessageItemDto>> {
+    const conversation =
+      await this.conversationRepository.getConversationByUserId(userId);
+
+    if (!conversation) {
+      return {
+        data: [],
+        total: 0,
+      };
+    }
+
+    const user = await this.userRepository.findOneById(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+    const token = await this.getPassport({
+      body: {
+        email: user.email,
+        name: user.fullName,
+        nimspace_ai_id: NIMSPACE_AI_ID,
+      },
+      headers: {
+        'x-app-code': X_APP_CODE,
+      },
+    });
+
+    const difyResponse = await this.getMessagesByConversationIdPagination({
+      token: token.access_token,
+      query: {
+        conversation_id: conversation.conversationId,
+        limit: 10,
+        page: 1,
+      },
+    });
+
+    return {
+      data: difyResponse.data.flatMap((message) => [
+        {
+          id: uuidv5(message.id, uuidv5.URL),
+          message: message.query,
+          type: 'sent',
+        },
+        {
+          id: message.id,
+          message: message.answer,
+          type: 'received',
+        },
+      ]),
+      total: difyResponse.total,
+    };
+  }
+
+  async getMessagesByConversationIdPagination(
+    input: GetMessagesByConversationIdPaginationDifyAiInputDto,
+  ): Promise<GetMessagesByConversationIdPaginationDifyAiResponseDto> {
+    try {
+      const dto = new GetMessagesByConversationIdPaginationDifyAiDto(
+        input.query,
+      );
+      const response =
+        await fetchDto<GetMessagesByConversationIdPaginationDifyAiResponseDto>({
+          httpService: this.httpService,
+          headers: new AxiosHeaders({
+            Authorization: `Bearer ${input.token}`,
+          }),
+          dto,
+        });
+
+      if (!response.status) {
+        throw new InternalServerErrorException(response.data);
+      }
+
+      return response.data;
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
   }
 }
